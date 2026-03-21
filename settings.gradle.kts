@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AndroidSpace"
+rootProject.name = "Android Space"
 include(":app")
