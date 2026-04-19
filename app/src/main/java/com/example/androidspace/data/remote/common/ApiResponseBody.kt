@@ -12,6 +12,12 @@ sealed class ApiResponseBody<out T> {
 
     @Serializable
     data class Failure(
-        val errors: List<ApiError>,
+        val errors: List<ApiError>
     ) : ApiResponseBody<Nothing>()
+}
+
+fun ApiResponseBody.Failure.toApiException() : ApiException {
+    return ApiException(
+        errors = this.errors
+    )
 }

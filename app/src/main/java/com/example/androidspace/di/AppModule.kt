@@ -7,17 +7,12 @@ import android.content.Context.NOTIFICATION_SERVICE
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.navigation.NavHostController
-import com.example.androidspace.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import retrofit2.Retrofit
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import javax.inject.Singleton
 
 @Module
