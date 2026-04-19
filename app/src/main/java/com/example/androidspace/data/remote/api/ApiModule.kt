@@ -1,6 +1,6 @@
-package com.example.androidspace.di
+package com.example.androidspace.data.remote.api
 
-import com.example.androidspace.data.remote.api.PaymentApi
+import com.example.androidspace.di.UnauthenticatedRetrofit
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,7 +13,7 @@ import javax.inject.Singleton
 object ApiModule {
     @Provides
     @Singleton
-    fun providePaymentApi(retrofit: Retrofit): PaymentApi {
+    fun providePaymentApi(@UnauthenticatedRetrofit retrofit: Retrofit): PaymentApi {
         return retrofit.create(PaymentApi::class.java)
     }
 }
