@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ApiError(
-    val code: String,
-    val message: String,
-    val field: String
+    val code: String?,
+    val message: String?,
+    val field: String?
 )
