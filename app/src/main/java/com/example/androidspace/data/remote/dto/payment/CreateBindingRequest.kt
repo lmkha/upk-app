@@ -1,4 +1,4 @@
-package com.example.androidspace.data.remote.dto
+package com.example.androidspace.data.remote.dto.payment
 
 import kotlinx.serialization.Serializable
 

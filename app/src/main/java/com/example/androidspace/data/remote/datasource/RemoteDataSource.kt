@@ -2,14 +2,13 @@ package com.example.androidspace.data.remote.datasource
 
 import com.example.androidspace.data.remote.common.ApiResponseBody
 import com.example.androidspace.data.remote.common.toApiException
-import com.example.androidspace.data.remote.dto.ApiResponseData
 import kotlinx.serialization.json.Json
 import okhttp3.ResponseBody
 import retrofit2.Response
 
 abstract class RemoteDataSource(val json: Json) {
 
-    protected suspend inline fun <reified T : ApiResponseData> callApi(
+    protected suspend inline fun <reified T> callApi(
         crossinline request: suspend () -> Response<ResponseBody>
     ): Result<T> {
         return try {
