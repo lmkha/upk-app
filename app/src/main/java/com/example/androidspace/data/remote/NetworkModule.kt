@@ -1,7 +1,11 @@
-package com.example.androidspace.di
+package com.example.androidspace.data.remote
 
 import com.example.androidspace.BuildConfig
 import com.example.androidspace.data.remote.interceptor.AuthInterceptor
+import com.example.androidspace.di.AuthenticatedOkHttpClient
+import com.example.androidspace.di.AuthenticatedRetrofit
+import com.example.androidspace.di.UnauthenticatedOkHttpClient
+import com.example.androidspace.di.UnauthenticatedRetrofit
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,10 +21,11 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
+    @UnauthenticatedRetrofit
     @Provides
     @Singleton
-    fun provideRetrofit(
-        @UnauthenticatedOkhttpClient okHttpClient: OkHttpClient,
+    fun provideUnauthenticatedRetrofit(
+        @UnauthenticatedOkHttpClient okHttpClient: OkHttpClient,
         json: Json
     ): Retrofit {
         val contentType = "application/json".toMediaType()
@@ -31,10 +36,25 @@ object NetworkModule {
             .build()
     }
 
-    @AuthorizedOkHttpClient
+    @AuthenticatedRetrofit
     @Provides
     @Singleton
-    fun provideAuthorizedOkHttpClient(
+    fun provideAuthenticatedRetrofit(
+        @AuthenticatedOkHttpClient okHttpClient: OkHttpClient,
+        json: Json
+    ): Retrofit {
+        val contentType = "application/json".toMediaType()
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.API_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory(contentType))
+            .build()
+    }
+
+    @AuthenticatedOkHttpClient
+    @Provides
+    @Singleton
+    fun provideAuthenticatedOkHttpClient(
         authInterceptor: AuthInterceptor,
 //        tokenAuthenticator: TokenAuthenticator,
     ) : OkHttpClient {
@@ -44,10 +64,10 @@ object NetworkModule {
             .build()
     }
 
-    @UnauthenticatedOkhttpClient
+    @UnauthenticatedOkHttpClient
     @Provides
     @Singleton
-    fun provideUnauthorizedOkHttpClient() : OkHttpClient {
+    fun provideUnauthenticatedOkHttpClient() : OkHttpClient {
         return OkHttpClient.Builder()
             .build()
     }
