@@ -1,4 +1,4 @@
-package com.example.androidspace.data.remote.dto
+package com.example.androidspace.data.remote.dto.payment
 
 import com.example.androidspace.models.CreatePaymentBindingModel
 import kotlinx.serialization.Serializable
@@ -8,7 +8,7 @@ data class CreatePaymentBindingDto(
     val customerId: String,
     val clientSecret: String,
     val ephemeralKeySecret: String
-) : ApiResponseData
+)
 
 fun CreatePaymentBindingDto.toDomain(): CreatePaymentBindingModel {
     return CreatePaymentBindingModel(
