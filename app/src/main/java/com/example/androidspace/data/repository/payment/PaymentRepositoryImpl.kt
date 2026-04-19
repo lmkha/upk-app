@@ -11,15 +11,6 @@ class PaymentRepositoryImpl @Inject constructor(
     private val paymentRemoteDataSource: PaymentRemoteDataSource
 ) : PaymentRepository {
     override suspend fun createBinding(): Result<CreatePaymentBindingModel> {
-        val result = paymentRemoteDataSource.createBinding()
-        return result.fold(
-            onSuccess = { dto->
-                val model = dto.toDomain()
-                Result.success(model)
-            },
-            onFailure = { throwable ->
-                Result.failure(throwable)
-            }
-        )
+        return paymentRemoteDataSource.createBinding().map { dto -> dto.toDomain() }
     }
 }
