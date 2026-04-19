@@ -20,8 +20,8 @@ abstract class RemoteDataSource(val json: Json) {
                 val body = json.decodeFromString<ApiResponseBody.Success<T>>(successString)
                 return Result.success(body.data)
             } else {
-                val successString = response.errorBody()?.string() ?: ""
-                val body = json.decodeFromString<ApiResponseBody.Failure>(successString)
+                val errorString = response.errorBody()?.string() ?: ""
+                val body = json.decodeFromString<ApiResponseBody.Failure>(errorString)
                 val exception = body.toApiException()
                 return Result.failure(exception)
             }
