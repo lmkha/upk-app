@@ -3,7 +3,6 @@ package com.example.androidspace.ui.screens.add_payment_binding
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.example.androidspace.data.remote.common.ApiException
-import com.example.androidspace.data.remote.dto.toDomain
 import com.example.androidspace.data.repository.payment.PaymentRepository
 import com.stripe.android.paymentsheet.CreateIntentResult
 import com.stripe.android.paymentsheet.PaymentSheetResult
@@ -18,9 +17,8 @@ class AddPaymentBindingViewModel @Inject constructor(
 
     suspend fun fetchClientSecret(): CreateIntentResult {
         return paymentRepository.createBinding().fold(
-            onSuccess = { dto->
-                val createPaymentBindingModel = dto.toDomain()
-                CreateIntentResult.Success(createPaymentBindingModel.clientSecret)
+            onSuccess = { model->
+                CreateIntentResult.Success(model.clientSecret)
             },
             onFailure = { throwable ->
                 when (throwable) {
