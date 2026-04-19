@@ -18,8 +18,6 @@ fun AddPaymentBindingScreen(viewModel: AddPaymentBindingViewModel = hiltViewMode
     val paymentSheet = remember {
         PaymentSheet.Builder(viewModel::onPaymentSheetResult)
             .createIntentCallback { paymentMethod, shouldSavePaymentMethod ->
-                println(paymentMethod.toString())
-                println(shouldSavePaymentMethod.toString())
                 viewModel.fetchClientSecret()
             }
     }.build()
