@@ -1,7 +1,7 @@
 package com.example.androidspace.data.repository.payment
 
-import com.example.androidspace.models.CreatePaymentBindingModel
-import com.example.androidspace.models.PaymentProviderModel
+import com.example.androidspace.domain.models.CreatePaymentBindingModel
+import com.example.androidspace.domain.models.PaymentProviderModel
 
 interface PaymentRepository {
     suspend fun createBinding(): Result<CreatePaymentBindingModel>

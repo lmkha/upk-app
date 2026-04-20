@@ -4,8 +4,8 @@ import com.example.androidspace.data.remote.datasource.payment.PaymentRemoteData
 import com.example.androidspace.data.remote.dto.PaymentProviderDto
 import com.example.androidspace.data.remote.dto.payment.toDomain
 import com.example.androidspace.data.remote.dto.toDomain
-import com.example.androidspace.models.CreatePaymentBindingModel
-import com.example.androidspace.models.PaymentProviderModel
+import com.example.androidspace.domain.models.CreatePaymentBindingModel
+import com.example.androidspace.domain.models.PaymentProviderModel
 import javax.inject.Inject
 import javax.inject.Singleton
 
