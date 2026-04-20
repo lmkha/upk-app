@@ -1,7 +1,7 @@
 package com.example.androidspace.data.remote.datasource
 
+import com.example.androidspace.data.remote.common.ApiException
 import com.example.androidspace.data.remote.common.ApiResponseBody
-import com.example.androidspace.data.remote.common.toApiException
 import kotlinx.serialization.json.Json
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -28,5 +28,11 @@ abstract class RemoteDataSource(val json: Json) {
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    protected fun ApiResponseBody.Failure.toApiException(): ApiException {
+        return ApiException(
+            errors = this.errors
+        )
     }
 }

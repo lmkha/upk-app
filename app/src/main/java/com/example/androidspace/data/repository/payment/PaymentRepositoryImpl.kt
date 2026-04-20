@@ -12,7 +12,7 @@ import javax.inject.Singleton
 @Singleton
 class PaymentRepositoryImpl @Inject constructor(
     private val paymentRemoteDataSource: PaymentRemoteDataSource
-) : PaymentRepository {
+): PaymentRepository {
     override suspend fun createBinding(): Result<CreatePaymentBindingModel> {
         return paymentRemoteDataSource.createBinding().map { dto -> dto.toDomain() }
     }

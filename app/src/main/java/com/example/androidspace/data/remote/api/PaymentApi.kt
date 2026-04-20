@@ -16,5 +16,5 @@ interface PaymentApi {
     ): Response<ResponseBody>
 
     @GET("$BASE_PATH/providers/available")
-    suspend fun getAvailablePaymentProviders() : Response<ResponseBody>
+    suspend fun getAvailablePaymentProviders(): Response<ResponseBody>
 }

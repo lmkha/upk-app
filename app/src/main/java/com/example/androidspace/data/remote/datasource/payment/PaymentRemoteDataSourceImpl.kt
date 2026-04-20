@@ -13,8 +13,8 @@ import javax.inject.Singleton
 class PaymentRemoteDataSourceImpl @Inject constructor(
     private val paymentApi: PaymentApi,
     json: Json
-) : RemoteDataSource(json), PaymentRemoteDataSource {
-    override suspend fun createBinding() : Result<CreatePaymentBindingDto> {
+): RemoteDataSource(json), PaymentRemoteDataSource {
+    override suspend fun createBinding(): Result<CreatePaymentBindingDto> {
         return callApi { paymentApi.createBinding(CreateBindingRequest()) }
     }
 
