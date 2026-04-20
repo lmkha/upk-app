@@ -5,5 +5,5 @@ import com.example.androidspace.models.PaymentProviderModel
 
 interface PaymentRepository {
     suspend fun createBinding(): Result<CreatePaymentBindingModel>
-    suspend fun getAvailablePaymentProviders() : Result<List<PaymentProviderModel>>
+    suspend fun getAvailablePaymentProviders(): Result<List<PaymentProviderModel>>
 }

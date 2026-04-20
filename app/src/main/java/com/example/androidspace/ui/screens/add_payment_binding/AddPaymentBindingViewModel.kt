@@ -13,7 +13,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AddPaymentBindingViewModel @Inject constructor(
     private val paymentRepository: PaymentRepository
-) : ViewModel() {
+): ViewModel() {
 
     suspend fun fetchClientSecret(): CreateIntentResult {
         return paymentRepository.createBinding().fold(

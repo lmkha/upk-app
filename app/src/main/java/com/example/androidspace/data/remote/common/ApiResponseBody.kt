@@ -15,9 +15,3 @@ sealed class ApiResponseBody<out T> {
         val errors: List<ApiError>
     ) : ApiResponseBody<Nothing>()
 }
-
-fun ApiResponseBody.Failure.toApiException() : ApiException {
-    return ApiException(
-        errors = this.errors
-    )
-}
