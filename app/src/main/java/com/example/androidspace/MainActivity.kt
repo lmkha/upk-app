@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.example.androidspace.app.App
+import com.example.androidspace.ui.app.App
 import com.example.androidspace.ui.theme.AndroidSpaceTheme
 import dagger.hilt.android.AndroidEntryPoint
 
