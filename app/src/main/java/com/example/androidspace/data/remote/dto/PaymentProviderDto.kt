@@ -1,6 +1,6 @@
 package com.example.androidspace.data.remote.dto
 
-import com.example.androidspace.models.PaymentProviderModel
+import com.example.androidspace.domain.models.PaymentProviderModel
 import kotlinx.serialization.Serializable
 
 @Serializable

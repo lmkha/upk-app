@@ -1,4 +1,4 @@
-package com.example.androidspace.models
+package com.example.androidspace.domain.models
 
 data class PaymentProviderModel(
     val id: String,
