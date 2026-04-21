@@ -11,7 +11,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.example.upk.ui.app.App
-import com.example.upk.ui.theme.AndroidSpaceTheme
+import com.example.upk.ui.theme.UPKTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -20,7 +20,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
             setContent {
-            AndroidSpaceTheme {
+            UPKTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(
                         contentAlignment = Alignment.Center,
