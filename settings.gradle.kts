@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Android Space"
+rootProject.name = "UPK"
 include(":app")

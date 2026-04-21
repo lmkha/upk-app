@@ -10,7 +10,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.androidspace"
+    namespace = "com.example.upk"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
