@@ -20,7 +20,7 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun provideJson() : Json {
+    fun provideJson(): Json {
         return Json {
             encodeDefaults = true
             ignoreUnknownKeys = true
@@ -37,12 +37,12 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideNavHostController(@ApplicationContext appContext: Context) : NavHostController = NavHostController(appContext)
+    fun provideNavHostController(@ApplicationContext appContext: Context): NavHostController = NavHostController(appContext)
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @Provides
     @Singleton
-    fun provideLocaleManager(@ApplicationContext appContext: Context) : LocaleManager {
+    fun provideLocaleManager(@ApplicationContext appContext: Context): LocaleManager {
         return appContext.getSystemService(LocaleManager::class.java)
     }
 }
