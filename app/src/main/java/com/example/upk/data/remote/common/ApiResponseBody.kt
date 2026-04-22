@@ -8,10 +8,10 @@ sealed class ApiResponseBody<out T> {
     data class Success<T>(
         val data: T,
         val message: String? = null
-    ) : ApiResponseBody<T>()
+    ): ApiResponseBody<T>()
 
     @Serializable
     data class Failure(
         val errors: List<ApiError>
-    ) : ApiResponseBody<Nothing>()
+    ): ApiResponseBody<Nothing>()
 }

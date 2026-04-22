@@ -12,5 +12,5 @@ import dagger.hilt.components.SingletonComponent
 abstract class RepositoryModule {
 
     @Binds
-    abstract fun bindPaymentRepository(paymentRepositoryImpl: PaymentRepositoryImpl) : PaymentRepository
+    abstract fun bindPaymentRepository(paymentRepositoryImpl: PaymentRepositoryImpl): PaymentRepository
 }

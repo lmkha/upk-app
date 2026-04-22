@@ -12,5 +12,5 @@ import dagger.hilt.components.SingletonComponent
 abstract class RemoteDataSourceModule {
 
     @Binds
-    abstract fun bindPaymentRemoteDataSource(paymentRemoteDataSourceImpl: PaymentRemoteDataSourceImpl) : PaymentRemoteDataSource
+    abstract fun bindPaymentRemoteDataSource(paymentRemoteDataSourceImpl: PaymentRemoteDataSourceImpl): PaymentRemoteDataSource
 }

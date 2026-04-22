@@ -15,7 +15,7 @@ data class PaymentProviderDto(
     val status: String
 )
 
-fun PaymentProviderDto.toDomain() : PaymentProviderModel {
+fun PaymentProviderDto.toDomain(): PaymentProviderModel {
     return PaymentProviderModel(
         id = this.id,
         name = this.name,

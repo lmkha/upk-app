@@ -57,7 +57,7 @@ object NetworkModule {
     fun provideAuthenticatedOkHttpClient(
         authInterceptor: AuthInterceptor,
 //        tokenAuthenticator: TokenAuthenticator,
-    ) : OkHttpClient {
+    ): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
 //            .authenticator(tokenAuthenticator)
@@ -67,7 +67,7 @@ object NetworkModule {
     @UnauthenticatedOkHttpClient
     @Provides
     @Singleton
-    fun provideUnauthenticatedOkHttpClient() : OkHttpClient {
+    fun provideUnauthenticatedOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
             .build()
     }
