@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -18,7 +19,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.androidspace"
+        applicationId = "com.example.upk"
         minSdk = 24
         targetSdk = 37
         versionCode = 1
@@ -81,6 +82,8 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.kotlinx.serialization)
 
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 }
 
 kotlin {

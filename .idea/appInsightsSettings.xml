@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.upk" />
+                  <option name="mobileSdkAppId" value="1:179817396904:android:0386b05f95dd537dfba09d" />
+                  <option name="projectId" value="upk-app" />
+                  <option name="projectNumber" value="179817396904" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
