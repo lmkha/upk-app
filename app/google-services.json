@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "179817396904",
+    "project_id": "upk-app",
+    "storage_bucket": "upk-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:179817396904:android:0386b05f95dd537dfba09d",
+        "android_client_info": {
+          "package_name": "com.example.upk"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAmMe9iBJaIcT4FilOlV0OndQuYht66Dc8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
