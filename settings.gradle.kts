@@ -24,3 +24,12 @@ dependencyResolutionManagement {
 
 rootProject.name = "UPK"
 include(":app")
+include(":data:payment")
+include(":data:auth")
+include(":core:ui")
+include(":core:data")
+include(":core:domain")
+include(":feature:payment")
+include(":feature:subscription")
+include(":core:common")
+include(":domain:payment")
