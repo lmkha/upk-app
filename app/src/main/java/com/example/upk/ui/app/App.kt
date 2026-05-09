@@ -1,7 +1,7 @@
 package com.example.upk.ui.app
 
 import androidx.compose.runtime.Composable
-import com.example.upk.ui.screens.add_payment_binding.AddPaymentBindingScreen
+import com.example.payment.AddPaymentBindingScreen
 
 @Composable
 fun App() {

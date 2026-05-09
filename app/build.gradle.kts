@@ -63,13 +63,15 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
     implementation(libs.hilt.android)
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.hilt.navigation.compose)
     ksp(libs.hilt.android.compiler)
     ksp(libs.kotlin.metadata.jvm)
+
     implementation(libs.kotlinx.serialization.json)
+
     implementation(libs.androidx.navigation.compose)
 
     implementation(libs.stripe.android)
@@ -84,6 +86,10 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
+
+    api(project(":core:common"))
+    api(project(":core:data"))
+    api(project(":feature:payment"))
 }
 
 kotlin {
