@@ -2,7 +2,7 @@ package com.example.payment
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.data.remote.common.ApiException
+import com.example.data.common.ApiException
 import com.example.data.payment.repository.PaymentRepository
 import com.stripe.android.paymentsheet.CreateIntentResult
 import com.stripe.android.paymentsheet.PaymentSheetResult

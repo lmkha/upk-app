@@ -1,7 +1,7 @@
-package com.example.data.remote.datasource
+package com.example.data.datasource
 
-import com.example.data.remote.common.ApiException
-import com.example.data.remote.common.ApiResponseBody
+import com.example.data.common.ApiException
+import com.example.data.common.ApiResponseBody
 import kotlinx.serialization.json.Json
 import okhttp3.ResponseBody
 import retrofit2.Response

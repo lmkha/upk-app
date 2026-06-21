@@ -1,6 +1,6 @@
 package com.example.data.payment.datasource
 
-import com.example.data.remote.datasource.RemoteDataSource
+import com.example.data.datasource.RemoteDataSource
 import com.example.data.payment.api.PaymentApi
 import com.example.data.payment.dto.PaymentProviderDto
 import com.example.data.payment.dto.CreateBindingRequest
