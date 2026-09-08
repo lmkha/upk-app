@@ -32,7 +32,7 @@ abstract class RemoteDataSource(protected val json: Json) {
 
     protected fun ApiResponseBody.Failure.toApiException(): ApiException {
         return ApiException(
-            errors = this.errors
+            errors = this.fieldErrors
         )
     }
 }

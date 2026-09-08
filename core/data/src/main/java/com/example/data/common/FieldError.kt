@@ -3,7 +3,7 @@ package com.example.data.common
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApiError(
+data class FieldError(
     val code: String?,
     val message: String?,
     val field: String?

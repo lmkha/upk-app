@@ -12,6 +12,8 @@ sealed class ApiResponseBody<out T> {
 
     @Serializable
     data class Failure(
-        val errors: List<ApiError>
+        val message: String,
+        val code: String? = null,
+        val fieldErrors: List<FieldError> = emptyList()
     ): ApiResponseBody<Nothing>()
 }
