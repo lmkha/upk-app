@@ -23,7 +23,7 @@ class AddPaymentBindingViewModel @Inject constructor(
             onFailure = { throwable ->
                 when (throwable) {
                     is ApiException -> {
-                        Log.d("CHECK_VAR", "errors: ${throwable.errors}")
+                        Log.d("CHECK_VAR", "errors: ${throwable.fieldErrors}")
                         CreateIntentResult.Failure(
                             cause = Exception("Empty client secret"),
                             displayMessage = "Failed to create payment binding."

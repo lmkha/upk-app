@@ -4,5 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ApiException(
-    val errors: List<FieldError>
+    val code: String? = null,
+    override val message: String? = null,
+    val fieldErrors: List<FieldError>
 ): Exception()

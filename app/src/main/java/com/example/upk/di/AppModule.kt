@@ -24,8 +24,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideNavHostController(@ApplicationContext appContext: Context): NavHostController =
-        NavHostController(appContext)
+    fun provideNavHostController(@ApplicationContext appContext: Context): NavHostController = NavHostController(appContext)
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @Provides

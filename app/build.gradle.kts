@@ -59,7 +59,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
@@ -87,9 +86,9 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
 
-    api(project(":core:common"))
-    api(project(":core:data"))
-    api(project(":feature:payment"))
+    implementation(project(":core:common"))
+    implementation(project(":core:data"))
+    implementation(project(":feature:payment"))
 }
 
 kotlin {
