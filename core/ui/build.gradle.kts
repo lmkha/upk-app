@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.ui"
+    namespace = "com.example.upk.core.ui"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1

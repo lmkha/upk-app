@@ -1,0 +1,16 @@
+package com.example.upk.payment.data.di
+
+import com.example.upk.payment.data.datasource.PaymentRemoteDataSource
+import com.example.upk.payment.data.datasource.PaymentRemoteDataSourceImpl
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RemoteDataSourceModule {
+
+    @Binds
+    abstract fun bindPaymentRemoteDataSource(paymentRemoteDataSourceImpl: PaymentRemoteDataSourceImpl): PaymentRemoteDataSource
+}

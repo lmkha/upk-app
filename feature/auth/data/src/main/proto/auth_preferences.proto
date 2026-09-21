@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option java_package = "com.example.upk.auth.data";
+option java_multiple_files = true;
+
+message AuthSession {
+  string user_id = 1;
+  string access_token = 2;
+  string refresh_token = 3;
+  string email = 4;
+  string display_name = 5;
+  string avatar_url = 6;
+}
+
+message AuthPreferences {
+  string active_user_id = 1;
+  map<string, AuthSession> sessions = 2;
+}

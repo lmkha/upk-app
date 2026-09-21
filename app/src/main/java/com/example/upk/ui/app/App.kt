@@ -1,9 +1,14 @@
 package com.example.upk.ui.app
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import com.example.payment.AddPaymentBindingScreen
+import androidx.compose.ui.Modifier
 
 @Composable
 fun App() {
-    AddPaymentBindingScreen()
+    Column(modifier = Modifier.fillMaxSize()) {
+        Text("Hello")
+    }
 }
