@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+option java_package = "com.example.upk.settings.data";
+option java_multiple_files = true;
+
+message AppSettingsPreferences {
+  string language = 1;
+  enum ThemeProto {
+    THEME_UNSPECIFIED = 0;
+    SYSTEM = 1;
+    LIGHT = 2;
+    DARK = 3;
+  }
+  ThemeProto theme_mode = 2;
+}

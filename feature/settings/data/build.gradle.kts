@@ -39,6 +39,8 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     ksp(libs.kotlin.metadata.jvm)
+    implementation(project(":core:data"))
+    implementation(project(":feature:settings:domain"))
 }
 
 protobuf {

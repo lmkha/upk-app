@@ -5,6 +5,7 @@ import com.example.upk.core.data.AuthenticatedRetrofit
 import com.example.upk.core.data.BuildConfig
 import com.example.upk.core.data.UnauthenticatedOkHttpClient
 import com.example.upk.core.data.UnauthenticatedRetrofit
+import com.example.upk.core.data.remote.interceptor.AcceptLanguageInterceptor
 import com.example.upk.core.data.remote.interceptor.AuthInterceptor
 import com.example.upk.core.data.remote.interceptor.TokenAuthenticator
 import dagger.Module
@@ -27,8 +28,10 @@ object NetworkModule {
     fun provideAuthenticatedOkHttpClient(
         authInterceptor: AuthInterceptor,
         tokenAuthenticator: TokenAuthenticator,
+        acceptLanguageInterceptor: AcceptLanguageInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
+            .addInterceptor(acceptLanguageInterceptor)
             .addInterceptor(authInterceptor)
             .authenticator(tokenAuthenticator)
             .build()
@@ -37,8 +40,12 @@ object NetworkModule {
     @UnauthenticatedOkHttpClient
     @Provides
     @Singleton
-    fun provideUnauthenticatedOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder().build()
+    fun provideUnauthenticatedOkHttpClient(
+        acceptLanguageInterceptor: AcceptLanguageInterceptor
+    ): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(acceptLanguageInterceptor)
+            .build()
     }
 
     @UnauthenticatedRetrofit

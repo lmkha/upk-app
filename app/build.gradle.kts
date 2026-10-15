@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.secrets)
     alias(libs.plugins.google.services)
 }
 
@@ -42,7 +41,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
-        buildConfig = true
         compose = true
     }
 }
@@ -86,7 +84,14 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
 
+    implementation(libs.androidx.core.splashscreen)
+
+    implementation(project(":core:data"))
     implementation(project(":feature:auth:data"))
+    implementation(project(":feature:home:ui"))
+    implementation(project(":feature:settings:ui"))
+    implementation(project(":feature:settings:domain"))
+    implementation(project(":feature:settings:data"))
 }
 
 kotlin {

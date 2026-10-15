@@ -1,9 +1,10 @@
 [versions]
 agp = "9.4.1"
 converterKotlinxSerialization = "3.0.0"
+coreSplashscreen = "1.2.0"
 datastorePreferences = "1.2.1"
-financialConnections = "23.22.0"
-firebaseBom = "35.0.0"
+financialConnections = "23.23.0"
+firebaseBom = "35.0.2"
 hiltAndroid = "2.60.1"
 kotlin = "2.4.21"
 ksp = "2.3.12"
@@ -19,7 +20,7 @@ okhttpBom = "5.5.0"
 protobufKotlinLite = "4.36.2"
 protobufPlugin = "0.10.0"
 retrofit = "3.0.0"
-stripeAndroid = "23.22.0"
+stripeAndroid = "23.23.0"
 hiltNavigationCompose = "1.4.0"
 navigationCompose = "2.10.2"
 appcompat = "1.8.0"
@@ -29,6 +30,7 @@ googleServices = "4.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastorePreferences" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 converter-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "converterKotlinxSerialization" }

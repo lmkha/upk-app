@@ -7,7 +7,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.upk.payment.ui.BuildConfig
 import com.stripe.android.PaymentConfiguration
 import com.stripe.android.paymentsheet.PaymentSheet
 
@@ -24,7 +23,7 @@ fun AddPaymentBindingScreen(viewModel: AddPaymentBindingViewModel = hiltViewMode
     LaunchedEffect(Unit) {
         PaymentConfiguration.init(
             context,
-            publishableKey = BuildConfig.stripePublishableKey
+            publishableKey = ""
         )
     }
 
