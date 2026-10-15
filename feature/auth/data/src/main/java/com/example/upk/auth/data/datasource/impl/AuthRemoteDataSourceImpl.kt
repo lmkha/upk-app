@@ -1,5 +1,6 @@
-package com.example.upk.auth.data.datasource
+package com.example.upk.auth.data.datasource.impl
 
+import com.example.upk.auth.data.datasource.AuthRemoteDataSource
 import com.example.upk.auth.data.remote.api.AuthApi
 import com.example.upk.auth.data.remote.dto.RefreshTokenDto
 import com.example.upk.auth.data.remote.payloads.RefreshTokenRequest

@@ -4,11 +4,13 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
 import com.example.upk.auth.data.AuthPreferences
-import com.example.upk.auth.data.TokenProviderImpl
+import com.example.upk.auth.data.token.TokenProviderImpl
+import com.example.upk.auth.data.datasource.AuthLocalDataSource
+import com.example.upk.auth.data.datasource.impl.AuthLocalDataSourceImpl
 import com.example.upk.auth.data.local.datastore.AuthPreferencesSerializer
 import com.example.upk.auth.data.remote.api.AuthApi
 import com.example.upk.auth.data.datasource.AuthRemoteDataSource
-import com.example.upk.auth.data.datasource.AuthRemoteDataSourceImpl
+import com.example.upk.auth.data.datasource.impl.AuthRemoteDataSourceImpl
 import com.example.upk.core.data.UnauthenticatedRetrofit
 import com.example.upk.core.data.remote.TokenProvider
 import dagger.Binds
@@ -56,4 +58,9 @@ abstract class AuthModule {
             return context.authPreferences
         }
     }
+
+    @Binds
+    abstract fun bindAuthLocalDataSource(
+        impl: AuthLocalDataSourceImpl
+    ): AuthLocalDataSource
 }
