@@ -1,10 +1,9 @@
-package com.example.upk.auth.data.datasource.impl
+package com.example.upk.auth.data.local.datasource
 
 import androidx.datastore.core.DataStore
 import com.example.upk.auth.data.AuthPreferences
 import com.example.upk.auth.data.copy
-import com.example.upk.auth.data.datasource.AuthLocalDataSource
-import com.example.upk.core.data.datasource.LocalDataSource
+import com.example.upk.core.data.local.BaseLocalDataSource
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -12,7 +11,7 @@ import javax.inject.Singleton
 @Singleton
 class AuthLocalDataSourceImpl @Inject constructor(
     private val authDataStore: DataStore<AuthPreferences>
-) : LocalDataSource(), AuthLocalDataSource {
+) : BaseLocalDataSource(), AuthLocalDataSource {
 
     override suspend fun getAccessToken(): String? {
         val prefs = authDataStore.data.firstOrNull()

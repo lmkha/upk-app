@@ -6,4 +6,6 @@ import kotlinx.coroutines.flow.Flow
 interface SettingsRepository {
     fun getThemeMode(): Flow<ThemeMode>
     suspend fun setThemeMode(mode: ThemeMode)
+    fun getLanguageTag(): Flow<String>
+    suspend fun setLanguageTag(languageTag: String)
 }

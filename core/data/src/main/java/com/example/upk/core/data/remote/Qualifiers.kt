@@ -1,4 +1,4 @@
-package com.example.upk.core.data
+package com.example.upk.core.data.remote
 
 import javax.inject.Qualifier
 

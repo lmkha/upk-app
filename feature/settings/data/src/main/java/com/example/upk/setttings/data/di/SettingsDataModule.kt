@@ -1,11 +1,16 @@
-package com.example.settings.data
+package com.example.upk.setttings.data.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.dataStore
+import com.example.upk.setttings.data.local.datasource.SettingsLocalDataSource
+import com.example.upk.setttings.data.local.datasource.SettingsLocalDataSourceImpl
+import com.example.upk.setttings.data.local.datastore.AppSettingsPreferencesSerializer
+import com.example.upk.setttings.data.repository.SettingsRepositoryImpl
 import com.example.upk.settings.data.AppSettingsPreferences
 import com.example.upk.core.data.remote.AppLanguageProvider
 import com.example.upk.settings.domain.repository.SettingsRepository
+import com.example.upk.setttings.data.language.SettingsAppLanguageProviderImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -30,6 +35,12 @@ abstract class SettingsDataModule {
     abstract fun bindAppSettingsRepository(
         impl: SettingsRepositoryImpl
     ): SettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSettingsLocalDataSource(
+        impl: SettingsLocalDataSourceImpl
+    ): SettingsLocalDataSource
 
     companion object {
         @Provides

@@ -1,6 +1,6 @@
 package com.example.upk.payment.data.di
 
-import com.example.upk.core.data.UnauthenticatedRetrofit
+import com.example.upk.core.data.remote.UnauthenticatedRetrofit
 import com.example.upk.payment.data.api.PaymentApi
 import dagger.Module
 import dagger.Provides

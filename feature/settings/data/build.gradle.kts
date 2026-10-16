@@ -40,6 +40,7 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     ksp(libs.kotlin.metadata.jvm)
     implementation(project(":core:data"))
+    implementation(project(":core:common"))
     implementation(project(":feature:settings:domain"))
 }
 

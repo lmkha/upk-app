@@ -1,10 +1,6 @@
 package com.example.upk.core.data.remote
 
-import com.example.upk.core.data.AuthenticatedOkHttpClient
-import com.example.upk.core.data.AuthenticatedRetrofit
 import com.example.upk.core.data.BuildConfig
-import com.example.upk.core.data.UnauthenticatedOkHttpClient
-import com.example.upk.core.data.UnauthenticatedRetrofit
 import com.example.upk.core.data.remote.interceptor.AcceptLanguageInterceptor
 import com.example.upk.core.data.remote.interceptor.AuthInterceptor
 import com.example.upk.core.data.remote.interceptor.TokenAuthenticator

@@ -1,6 +1,6 @@
 package com.example.upk.payment.data.datasource
 
-import com.example.upk.core.data.datasource.RemoteDataSource
+import com.example.upk.core.data.remote.RemoteDataSource
 import com.example.upk.payment.data.api.PaymentApi
 import com.example.upk.payment.data.dto.PaymentProviderDto
 import com.example.upk.payment.data.dto.CreateBindingRequest

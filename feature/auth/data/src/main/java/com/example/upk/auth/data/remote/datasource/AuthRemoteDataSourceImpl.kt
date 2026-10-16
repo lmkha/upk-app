@@ -1,10 +1,9 @@
-package com.example.upk.auth.data.datasource.impl
+package com.example.upk.auth.data.remote.datasource
 
-import com.example.upk.auth.data.datasource.AuthRemoteDataSource
 import com.example.upk.auth.data.remote.api.AuthApi
 import com.example.upk.auth.data.remote.dto.RefreshTokenDto
 import com.example.upk.auth.data.remote.payloads.RefreshTokenRequest
-import com.example.upk.core.data.datasource.RemoteDataSource
+import com.example.upk.core.data.remote.RemoteDataSource
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton

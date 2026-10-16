@@ -2,8 +2,8 @@ package com.example.upk.auth.data.token
 
 import androidx.datastore.core.DataStore
 import com.example.upk.auth.data.AuthPreferences
-import com.example.upk.auth.data.datasource.AuthLocalDataSource
-import com.example.upk.auth.data.datasource.AuthRemoteDataSource
+import com.example.upk.auth.data.local.datasource.AuthLocalDataSource
+import com.example.upk.auth.data.remote.datasource.AuthRemoteDataSource
 import com.example.upk.core.data.remote.TokenProvider
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject

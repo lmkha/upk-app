@@ -1,4 +1,4 @@
-package com.example.upk.auth.data.datasource
+package com.example.upk.auth.data.local.datasource
 
 interface AuthLocalDataSource {
     suspend fun getAccessToken(): String?

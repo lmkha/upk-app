@@ -1,4 +1,4 @@
-package com.example.upk.core.data.datasource
+package com.example.upk.core.data.remote
 
 import com.example.upk.core.common.errors.EmptyErrorBodyException
 import com.example.upk.core.common.errors.EmptyResponseBodyException

@@ -1,29 +1,27 @@
-package com.example.settings.data
+package com.example.upk.setttings.data.repository
 
-import androidx.datastore.core.DataStore
+import com.example.upk.setttings.data.local.datasource.SettingsLocalDataSource
 import com.example.upk.settings.data.AppSettingsPreferences
 import com.example.upk.settings.domain.models.ThemeMode
 import com.example.upk.settings.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import java.util.Locale
 import javax.inject.Inject
 
 class SettingsRepositoryImpl @Inject constructor(
-    private val authDataStore: DataStore<AppSettingsPreferences>
+    private val localDataSource: SettingsLocalDataSource,
 ) : SettingsRepository {
 
     override fun getThemeMode(): Flow<ThemeMode> {
-        return authDataStore.data.map { preferences ->
-            mapToDomainTheme(preferences.themeMode)
-        }
+        return localDataSource.observeThemeMode()
+            .map(::mapToDomainTheme)
+            .distinctUntilChanged()
     }
 
     override suspend fun setThemeMode(mode: ThemeMode) {
-        authDataStore.updateData { preferences ->
-            preferences.toBuilder()
-                .setThemeMode(mapToProtoTheme(mode))
-                .build()
-        }
+        localDataSource.setThemeMode(mapToProtoTheme(mode))
     }
 
     private fun mapToDomainTheme(protoTheme: AppSettingsPreferences.ThemeProto): ThemeMode {
@@ -42,5 +40,24 @@ class SettingsRepositoryImpl @Inject constructor(
             ThemeMode.LIGHT -> AppSettingsPreferences.ThemeProto.LIGHT
             ThemeMode.SYSTEM -> AppSettingsPreferences.ThemeProto.SYSTEM
         }
+    }
+
+    override fun getLanguageTag(): Flow<String> {
+        return localDataSource.observeLanguageTag()
+            .distinctUntilChanged()
+    }
+
+    override suspend fun setLanguageTag(languageTag: String) {
+        val normalizedTag = languageTag
+            .trim()
+            .let { tag ->
+                if (tag.isBlank()) {
+                    ""
+                } else {
+                    Locale.forLanguageTag(tag).toLanguageTag()
+                }
+            }
+
+        localDataSource.setLanguageTag(normalizedTag)
     }
 }

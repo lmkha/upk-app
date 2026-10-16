@@ -1,4 +1,4 @@
-package com.example.settings.data
+package com.example.upk.setttings.data.language
 
 import java.util.Locale
 import javax.inject.Inject
@@ -8,8 +8,7 @@ import javax.inject.Singleton
 class LanguageSnapshot @Inject constructor() {
 
     @Volatile
-    private var languageTag: String =
-        Locale.getDefault().toLanguageTag()
+    private var languageTag: String = Locale.getDefault().toLanguageTag()
 
     fun getLanguageTag(): String = languageTag
 
