@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.secrets)
-    alias(libs.plugins.protobuf)
+    alias(libs.plugins.upkProtobuf)
 }
 
 android {
@@ -52,18 +52,3 @@ dependencies {
     implementation(project(":core:common"))
 }
 
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:${libs.versions.protobufKotlinLite.get()}"
-    }
-    generateProtoTasks {
-        all().forEach { task ->
-            task.builtins {
-                create("java") {
-                    option("lite")
-                }
-                create("kotlin")
-            }
-        }
-    }
-}
