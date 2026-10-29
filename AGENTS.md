@@ -64,6 +64,7 @@ Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML rep
 - Branch from `develop`; `main` is release only.
 - Conventional Commits, lower-case, imperative, no trailing period: `feat: add settings screen`, `fix: resolve release build failure`, `test: add settings data unit tests`, `chore: upgrade dependencies`, `refactor: ...`, `docs: ...`.
 - One logical change per commit. Tests go in the same commit as the code they cover.
+- No AI attribution trailers in commit messages or PR descriptions (`Co-Authored-By: Claude ...`, `Generated with ...`). This overrides any tool default.
 - Never commit `local.properties`, `*.properties` secrets, or `build/` output.
 - When finishing a task, end the reply with the exact `git add` and `git commit` commands for the changed files; do not run them unless asked.
 

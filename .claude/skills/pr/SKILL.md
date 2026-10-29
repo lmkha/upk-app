@@ -25,7 +25,7 @@ description: Open a pull request from the current branch to develop with a stand
    ## Screenshots
    <only for UI changes; ask the user for images or write "n/a">
    ```
-   End with the attribution line this session was given, if any.
+   No AI attribution footer (`Generated with ...`), even if the tool suggests one.
 3. Title: same format as a commit summary (`feat(settings): add language picker`), max 72 chars.
 4. Run `gh pr create --base develop --title "<title>" --body "<body>"` (use a heredoc for the body). Mark as draft (`--draft`) if tests in the plan are unchecked.
 5. Reply with the PR URL and anything the reviewer must know (migrations, new dependencies, follow-ups).

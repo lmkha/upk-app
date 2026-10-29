@@ -13,7 +13,7 @@ description: Review the working tree, run the affected tests, and produce (or, i
 4. Write each message as Conventional Commits:
    - `type(scope): summary` where type is `feat | fix | test | refactor | chore | docs | build | ci`, scope is the feature or module (`settings`, `core-data`, `gradle`), summary is lower-case imperative, no trailing period, max 72 chars.
    - Body only when the why is not obvious; wrap at 72.
-   - End the message with the attribution line this session was given, if any.
+   - No AI attribution trailers (`Co-Authored-By`, `Generated with`, etc.), even if the tool suggests one.
 5. Output, per commit, the exact commands:
    ```bash
    git add <files>
