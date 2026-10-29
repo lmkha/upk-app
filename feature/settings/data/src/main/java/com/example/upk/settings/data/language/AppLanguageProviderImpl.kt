@@ -1,8 +1,8 @@
-package com.example.upk.setttings.data.language
+package com.example.upk.settings.data.language
 
 import com.example.upk.core.common.ApplicationScope
 import com.example.upk.core.data.remote.AppLanguageProvider
-import com.example.upk.setttings.data.local.datasource.SettingsLocalDataSource
+import com.example.upk.settings.data.local.datasource.SettingsLocalDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map

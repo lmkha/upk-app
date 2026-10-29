@@ -1,6 +1,6 @@
-package com.example.upk.setttings.data.repository
+package com.example.upk.settings.data.repository
 
-import com.example.upk.setttings.data.local.datasource.SettingsLocalDataSource
+import com.example.upk.settings.data.local.datasource.SettingsLocalDataSource
 import com.example.upk.settings.data.AppSettingsPreferences
 import com.example.upk.settings.domain.models.ThemeMode
 import com.example.upk.settings.domain.repository.SettingsRepository

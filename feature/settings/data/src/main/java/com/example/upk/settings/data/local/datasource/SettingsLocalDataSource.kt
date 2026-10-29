@@ -1,4 +1,4 @@
-package com.example.upk.setttings.data.local.datasource
+package com.example.upk.settings.data.local.datasource
 
 import com.example.upk.settings.data.AppSettingsPreferences
 import kotlinx.coroutines.flow.Flow

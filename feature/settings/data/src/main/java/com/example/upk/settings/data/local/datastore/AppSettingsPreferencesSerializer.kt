@@ -1,4 +1,4 @@
-package com.example.upk.setttings.data.local.datastore
+package com.example.upk.settings.data.local.datastore
 
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer

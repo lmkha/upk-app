@@ -1,4 +1,4 @@
-package com.example.upk.setttings.data.language
+package com.example.upk.settings.data.language
 
 import java.util.Locale
 import javax.inject.Inject

@@ -1,4 +1,4 @@
-package com.example.upk.setttings.data.local.datasource
+package com.example.upk.settings.data.local.datasource
 
 import androidx.datastore.core.DataStore
 import com.example.upk.settings.data.AppSettingsPreferences
