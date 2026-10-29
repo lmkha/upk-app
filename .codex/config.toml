@@ -1,0 +1,18 @@
+# Project-level Codex CLI configuration.
+# Loaded on top of ~/.codex/config.toml once the project is marked as trusted
+# (Codex asks on first run, or set it manually in ~/.codex/config.toml).
+#
+# Instructions for the agent are NOT here: they live in AGENTS.md at the repo root,
+# which Codex reads automatically. Keep this file for tool settings only.
+# Check `codex --help` for the keys supported by the installed version.
+
+# Ask before running commands that leave the sandbox; let the agent edit files freely.
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+# AGENTS.md is small, but raise the limit if it ever grows past the default.
+project_doc_max_bytes = 65536
+
+[sandbox_workspace_write]
+# Gradle needs network for dependency resolution on a fresh clone.
+network_access = true

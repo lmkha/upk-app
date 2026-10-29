@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew *testDebugUnitTest*)",
+      "Bash(./gradlew *assembleDebug*)",
+      "Bash(./gradlew *assembleDebugAndroidTest*)",
+      "Bash(./gradlew *dependencies*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git branch*)",
+      "Bash(git show*)",
+      "Bash(gh pr view*)",
+      "Bash(gh pr diff*)",
+      "Bash(gh pr list*)"
+    ],
+    "deny": [
+      "Read(./local.properties)",
+      "Read(./debug.properties)",
+      "Read(./release.properties)",
+      "Read(./app/google-services.json)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean*)"
+    ]
+  }
+}
