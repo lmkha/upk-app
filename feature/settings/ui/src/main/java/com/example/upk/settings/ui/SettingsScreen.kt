@@ -10,6 +10,7 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -29,6 +31,19 @@ fun SettingsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    SettingsContent(
+        uiState = uiState,
+        onIntent = viewModel::onIntent,
+        modifier = modifier,
+    )
+}
+
+@Composable
+internal fun SettingsContent(
+    uiState: SettingsUiState,
+    onIntent: (SettingsIntent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         modifier = modifier
             .padding(16.dp)
@@ -62,7 +77,7 @@ fun SettingsScreen(
                             selected = uiState.themeMode == option,
                             enabled = enabled,
                             onClick = {
-                                viewModel.onIntent(
+                                onIntent(
                                     SettingsIntent.ThemeModeSelected(option),
                                 )
                             },
@@ -95,13 +110,61 @@ fun SettingsScreen(
 
             TextButton(
                 onClick = {
-                    viewModel.onIntent(
+                    onIntent(
                         SettingsIntent.ErrorMessageDismissed,
                     )
                 },
             ) {
                 Text("Dismiss")
             }
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Loaded - Dark Mode")
+@Composable
+private fun SettingsContentLoadedPreview() {
+    MaterialTheme {
+        Surface {
+            SettingsContent(
+                uiState = SettingsUiState(
+                    themeMode = ThemeMode.DARK,
+                    isLoading = false,
+                ),
+                onIntent = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Loading State")
+@Composable
+private fun SettingsContentLoadingPreview() {
+    MaterialTheme {
+        Surface {
+            SettingsContent(
+                uiState = SettingsUiState(
+                    isLoading = true,
+                ),
+                onIntent = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Error State")
+@Composable
+private fun SettingsContentErrorPreview() {
+    MaterialTheme {
+        Surface {
+            SettingsContent(
+                uiState = SettingsUiState(
+                    themeMode = ThemeMode.SYSTEM,
+                    isLoading = false,
+                    errorMessage = "Unable to update appearance settings.",
+                ),
+                onIntent = {},
+            )
         }
     }
 }

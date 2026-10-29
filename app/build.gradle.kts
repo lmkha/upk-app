@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -81,12 +82,10 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter.kotlinx.serialization)
 
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
-
     implementation(libs.androidx.core.splashscreen)
 
     implementation(project(":core:data"))
+    implementation(project(":core:analytics"))
     implementation(project(":feature:auth:data"))
     implementation(project(":feature:home:ui"))
     implementation(project(":feature:settings:ui"))

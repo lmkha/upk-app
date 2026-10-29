@@ -3,6 +3,8 @@ package com.example.upk.settings.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.upk.core.analytics.AnalyticsTracker
+import com.example.upk.core.analytics.AppAnalyticsEvent
 import com.example.upk.settings.domain.models.ThemeMode
 import com.example.upk.settings.domain.usecases.GetThemeModeUseCase
 import com.example.upk.settings.domain.usecases.UpdateThemeModeUseCase
@@ -35,6 +37,7 @@ sealed interface SettingsIntent {
 class SettingsViewModel @Inject constructor(
     private val getThemeModeUseCase: GetThemeModeUseCase,
     private val updateThemeModeUseCase: UpdateThemeModeUseCase,
+    private val analyticsTracker: AnalyticsTracker
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -46,13 +49,14 @@ class SettingsViewModel @Inject constructor(
 
     fun onIntent(intent: SettingsIntent) {
         when (intent) {
-            is SettingsIntent.ThemeModeSelected ->
+            is SettingsIntent.ThemeModeSelected -> {
                 changeThemeMode(intent.themeMode)
-
-            SettingsIntent.ErrorMessageDismissed ->
+            }
+            SettingsIntent.ErrorMessageDismissed -> {
                 _uiState.update {
                     it.copy(errorMessage = null)
                 }
+            }
         }
     }
 
@@ -101,6 +105,7 @@ class SettingsViewModel @Inject constructor(
 
             try {
                 updateThemeModeUseCase(themeMode)
+                analyticsTracker.logEvent(AppAnalyticsEvent.ThemeChanged(theme = themeMode.name))
                 // The observed Flow updates themeMode after persistence changes.
             } catch (exception: CancellationException) {
                 throw exception
