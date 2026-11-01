@@ -38,7 +38,7 @@ Current features: `auth`, `home`, `payment`, `settings`. Package root is `com.ex
 
 ## Testing rules
 
-Detailed rules for writing tests and fakes are in `.claude/rules/testing.md`. Claude Code loads that file automatically when touching test sources; other tools should read it before writing tests.
+Detailed rules for writing tests and fakes are in `.claude/rules/testing.md` (mirrored in `.agents/rules/testing.md`). Claude Code and Antigravity load it automatically when touching test sources; other tools should read it before writing tests.
 
 - Every new use case, repository, data source, serializer or ViewModel ships with unit tests in the same module under `src/test`.
 - Prefer hand-written fakes over mocking libraries. Fakes live next to the tests that use them (`FakeSettingsRepository`, `FakeDataStore`).
@@ -70,9 +70,9 @@ Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML rep
 
 ## Repeatable workflows
 
-Step-by-step recipes live in `.claude/skills/<name>/SKILL.md` (open Agent Skills format). `.codex/skills/` contains symlinks to the same folders so Codex finds them too. Claude Code runs them with `/<name>`; other tools should open the file and follow the steps when the task matches its description.
+Step-by-step recipes live in `.claude/skills/<name>/SKILL.md` (open Agent Skills format). `.codex/skills/`, `.gemini/skills/` and `.agents/skills/` contain symlinks to the same folders so Codex, Gemini CLI and Antigravity find them too. Tools with slash-skill support run them via `/<name>`; other tools should open the file and follow the steps when the task matches its description.
 
-Tool-specific settings: `.claude/settings.json` (Claude Code), `.codex/config.toml` (Codex). Agent instructions never go in those files.
+Tool-specific settings: `.claude/settings.json` (Claude Code), `.codex/config.toml` (Codex), `.gemini/settings.json` (Gemini CLI). Agent instructions never go in those files.
 
 | Skill | Use it for |
 | --- | --- |
@@ -87,7 +87,7 @@ Tool-specific settings: `.claude/settings.json` (Claude Code), `.codex/config.to
 | `pr` | open a PR to `develop` with the standard description via `gh` |
 | `review` | review a diff/branch/PR against the project rules, findings by severity |
 
-Path-scoped rules in `.claude/rules/` (Claude Code loads them automatically; other tools should read the matching file before editing that area):
+Path-scoped rules in `.claude/rules/` and `.agents/rules/` (Claude Code and Antigravity load them automatically; other tools should read the matching file before editing that area):
 
 | Rule file | Applies to |
 | --- | --- |

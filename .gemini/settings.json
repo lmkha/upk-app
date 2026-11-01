@@ -1,0 +1,37 @@
+{
+  "$schema": "https://raw.githubusercontent.com/google-gemini/gemini-cli/main/schemas/settings.schema.json",
+  "context": {
+    "fileName": [
+      "AGENTS.md",
+      "GEMINI.md"
+    ],
+    "fileFiltering": {
+      "respectGitIgnore": true,
+      "respectGeminiIgnore": true
+    }
+  },
+  "tools": {
+    "allowed": [
+      "run_shell_command(./gradlew testDebugUnitTest)",
+      "run_shell_command(./gradlew :app:assembleDebug)",
+      "run_shell_command(./gradlew :app:testDebugUnitTest)",
+      "run_shell_command(./gradlew :core:)",
+      "run_shell_command(./gradlew :feature:)",
+      "run_shell_command(git status)",
+      "run_shell_command(git diff)",
+      "run_shell_command(git log)",
+      "run_shell_command(git branch)",
+      "run_shell_command(git show)",
+      "run_shell_command(gh pr view)",
+      "run_shell_command(gh pr diff)",
+      "run_shell_command(gh pr list)"
+    ],
+    "exclude": [
+      "run_shell_command(git push --force)",
+      "run_shell_command(git push -f)",
+      "run_shell_command(git reset --hard)",
+      "run_shell_command(git clean)"
+    ]
+  }
+}
+

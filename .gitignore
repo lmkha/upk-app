@@ -16,3 +16,8 @@ release.properties
 # Claude Code personal files
 CLAUDE.local.md
 .claude/settings.local.json
+
+# Gemini / Antigravity personal and runtime files
+GEMINI.local.md
+.gemini/settings.local.json
+.gemini/antigravity*/
