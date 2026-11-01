@@ -9,13 +9,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.upk.home.ui.HomeScreen
 import com.example.upk.settings.domain.models.ThemeMode
 import com.example.upk.settings.ui.SettingsScreen
-import com.example.upk.ui.Destination
+import com.example.upk.ui.navigation.Destination
+import com.example.upk.ui.navigation.screenComposable
 import com.example.upk.ui.theme.UPKTheme
 
 @Composable
@@ -33,15 +33,21 @@ fun App(viewModel: AppViewModel) {
 
     val navController = rememberNavController()
 
+    val onScreenViewed: (String) -> Unit = { screenName ->
+        viewModel.onIntent(AppIntent.ScreenViewed(screenName))
+    }
+
     UPKTheme(darkTheme = darkTheme) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
             NavHost(
                 navController = navController,
                 startDestination = Destination.MainGraph,
-                modifier = Modifier.fillMaxSize().padding(innerPadding)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
             ) {
                 navigation<Destination.MainGraph>(startDestination = Destination.MainGraph.Home) {
-                    composable<Destination.MainGraph.Home> {
+                    screenComposable<Destination.MainGraph.Home>(onScreenViewed) {
                         HomeScreen(
                             onNavigateToSettings = {
                                 navController.navigate(Destination.Settings)
@@ -49,10 +55,8 @@ fun App(viewModel: AppViewModel) {
                         )
                     }
                 }
-                composable<Destination.Settings> {
-                    SettingsScreen(
-                        modifier = Modifier.fillMaxSize(),
-                    )
+                screenComposable<Destination.Settings>(onScreenViewed) {
+                    SettingsScreen(modifier = Modifier.fillMaxSize())
                 }
             }
         }
