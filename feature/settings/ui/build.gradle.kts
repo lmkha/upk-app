@@ -49,4 +49,5 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(project(":feature:settings:domain"))
     implementation(project(":core:analytics"))
+    implementation(project(":core:crashlytics"))
 }

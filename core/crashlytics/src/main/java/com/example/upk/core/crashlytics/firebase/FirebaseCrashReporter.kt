@@ -1,12 +1,12 @@
-package com.example.upk.core.analytics.firebase
+package com.example.upk.core.crashlytics.firebase
 
-import com.example.upk.core.analytics.CrashReporter
+import com.example.upk.core.crashlytics.CrashReporter
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FirebaseCrashReporter @Inject constructor() : CrashReporter {
+internal class FirebaseCrashReporter @Inject constructor() : CrashReporter {
 
     private val crashlytics = FirebaseCrashlytics.getInstance()
 

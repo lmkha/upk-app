@@ -1,4 +1,4 @@
-package com.example.upk.core.analytics
+package com.example.upk.core.crashlytics
 
 interface CrashReporter {
     fun recordNonFatal(exception: Throwable)

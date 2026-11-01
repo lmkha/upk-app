@@ -86,6 +86,7 @@ dependencies {
 
     implementation(project(":core:data"))
     implementation(project(":core:analytics"))
+    implementation(project(":core:crashlytics"))
     implementation(project(":feature:auth:data"))
     implementation(project(":feature:home:ui"))
     implementation(project(":feature:settings:ui"))
