@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 
 /**
- * Fake repository for Compose UI tests. Same behaviour as the unit test fake:
+ * Fake repository for Compose UI tests. Same behavior as the unit test fake:
  * in-memory storage plus switches to simulate errors and a suspended write.
  * androidTest cannot see files under src/test, so the fake is duplicated here.
  */

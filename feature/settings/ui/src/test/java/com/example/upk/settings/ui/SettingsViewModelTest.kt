@@ -20,16 +20,19 @@ class SettingsViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var repository: FakeSettingsRepository
+    private lateinit var analyticsTracker: FakeAnalyticsTracker
 
     @Before
     fun setUp() {
         repository = FakeSettingsRepository()
+        analyticsTracker = FakeAnalyticsTracker()
     }
 
     /** The ViewModel is created inside each test (not in @Before) because some tests configure the fake first. */
     private fun createViewModel() = SettingsViewModel(
         getThemeModeUseCase = GetThemeModeUseCase(repository),
         updateThemeModeUseCase = UpdateThemeModeUseCase(repository),
+        analyticsTracker = analyticsTracker
     )
 
     // ---------- Initial state ----------
@@ -120,6 +123,7 @@ class SettingsViewModelTest {
         val viewModel = SettingsViewModel(
             GetThemeModeUseCase(neverEmitRepository),
             UpdateThemeModeUseCase(neverEmitRepository),
+            analyticsTracker
         )
         assertTrue(viewModel.uiState.value.isLoading)
 
