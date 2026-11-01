@@ -1,12 +1,6 @@
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
 .DS_Store
 /build
 **/build/
@@ -17,6 +11,7 @@ local.properties
 debug.properties
 release.properties
 .kotlin/
+/.idea/
 
 # Claude Code personal files
 CLAUDE.local.md
