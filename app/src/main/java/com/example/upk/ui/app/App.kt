@@ -5,18 +5,25 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.upk.home.ui.HomeScreen
 import com.example.upk.settings.domain.models.ThemeMode
 import com.example.upk.settings.ui.SettingsScreen
 import com.example.upk.ui.navigation.Destination
-import com.example.upk.ui.navigation.screenComposable
+import com.example.upk.ui.navigation.toAnalyticsScreenName
 import com.example.upk.ui.theme.UPKTheme
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapNotNull
 
 @Composable
 fun App(viewModel: AppViewModel) {
@@ -25,16 +32,24 @@ fun App(viewModel: AppViewModel) {
 
     val systemDarkTheme = isSystemInDarkTheme()
 
+    val navController = rememberNavController()
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(navController, lifecycleOwner) {
+        navController.currentBackStackEntryFlow
+            .flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.RESUMED)
+            .mapNotNull { entry -> entry.destination.toAnalyticsScreenName() }
+            .distinctUntilChanged()
+            .collect { screenName ->
+                viewModel.onIntent(AppIntent.ScreenViewed(screenName))
+            }
+    }
+
     val darkTheme = when (uiState.themeMode) {
         ThemeMode.DARK -> true
         ThemeMode.LIGHT -> false
         ThemeMode.SYSTEM -> systemDarkTheme
-    }
-
-    val navController = rememberNavController()
-
-    val onScreenViewed: (String) -> Unit = { screenName ->
-        viewModel.onIntent(AppIntent.ScreenViewed(screenName))
     }
 
     UPKTheme(darkTheme = darkTheme) {
@@ -47,15 +62,13 @@ fun App(viewModel: AppViewModel) {
                     .padding(innerPadding)
             ) {
                 navigation<Destination.MainGraph>(startDestination = Destination.MainGraph.Home) {
-                    screenComposable<Destination.MainGraph.Home>(onScreenViewed) {
+                    composable<Destination.MainGraph.Home> {
                         HomeScreen(
-                            onNavigateToSettings = {
-                                navController.navigate(Destination.Settings)
-                            }
+                            onNavigateToSettings = { navController.navigate(Destination.Settings) },
                         )
                     }
                 }
-                screenComposable<Destination.Settings>(onScreenViewed) {
+                composable<Destination.Settings> {
                     SettingsScreen(modifier = Modifier.fillMaxSize())
                 }
             }
