@@ -1,6 +1,5 @@
 package com.example.upk.ui.app
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.upk.core.analytics.AnalyticsTracker
@@ -22,8 +21,7 @@ sealed interface AppIntent {
 }
 
 data class AppUiState(
-    val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val isThemeResolved: Boolean = false,
+    val themeMode: ThemeMode? = null,
 )
 
 @HiltViewModel
@@ -37,20 +35,8 @@ class AppViewModel @Inject constructor(
     val uiState: StateFlow<AppUiState> =
         getThemeModeUseCase()
             .distinctUntilChanged()
-            .map { themeMode ->
-                AppUiState(
-                    themeMode = themeMode,
-                    isThemeResolved = true,
-                )
-            }
-            .catch {
-                emit(
-                    AppUiState(
-                        themeMode = ThemeMode.SYSTEM,
-                        isThemeResolved = true,
-                    )
-                )
-            }
+            .map { themeMode -> AppUiState(themeMode = themeMode) }
+            .catch { emit(AppUiState(themeMode = ThemeMode.SYSTEM)) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.Eagerly,
@@ -59,10 +45,7 @@ class AppViewModel @Inject constructor(
 
     fun onIntent(intent: AppIntent) {
         when (intent) {
-            is AppIntent.ScreenViewed ->  {
-                Log.w("FirebaseAnalytics", "Log screen ${intent.screenName}")
-                trackScreenView(intent.screenName)
-            }
+            is AppIntent.ScreenViewed -> trackScreenView(intent.screenName)
         }
     }
 

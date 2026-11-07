@@ -85,6 +85,7 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
 
     implementation(project(":core:data"))
+    implementation(project(":core:common"))
     implementation(project(":core:analytics"))
     implementation(project(":core:crashlytics"))
     implementation(project(":feature:auth:data"))

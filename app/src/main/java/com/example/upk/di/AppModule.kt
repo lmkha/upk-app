@@ -15,21 +15,25 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AppModule {
-    @Provides
-    @Singleton
-    fun provideNotificationManager(@ApplicationContext context: Context): NotificationManager {
-        return context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-    }
+abstract class AppModule {
 
-    @Provides
-    @Singleton
-    fun provideNavHostController(@ApplicationContext appContext: Context): NavHostController = NavHostController(appContext)
+    companion object {
+        @Provides
+        @Singleton
+        fun provideNotificationManager(@ApplicationContext context: Context): NotificationManager {
+            return context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    @Provides
-    @Singleton
-    fun provideLocaleManager(@ApplicationContext appContext: Context): LocaleManager {
-        return appContext.getSystemService(LocaleManager::class.java)
+        @Provides
+        @Singleton
+        fun provideNavHostController(@ApplicationContext appContext: Context): NavHostController =
+            NavHostController(appContext)
+
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        @Provides
+        @Singleton
+        fun provideLocaleManager(@ApplicationContext appContext: Context): LocaleManager {
+            return appContext.getSystemService(LocaleManager::class.java)
+        }
     }
 }
