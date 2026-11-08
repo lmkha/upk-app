@@ -36,15 +36,18 @@ class SettingsScreenTest {
     val composeRule = createComposeRule()
 
     private lateinit var repository: FakeSettingsRepository
+    private lateinit var analyticsTracker: FakeAnalyticsTracker
 
     @Before
     fun setUp() {
         repository = FakeSettingsRepository()
+        analyticsTracker = FakeAnalyticsTracker()
     }
 
     private fun createViewModel(repo: FakeSettingsRepository = repository) = SettingsViewModel(
         getThemeModeUseCase = GetThemeModeUseCase(repo),
         updateThemeModeUseCase = UpdateThemeModeUseCase(repo),
+        analyticsTracker = analyticsTracker,
     )
 
     private fun setContent(viewModel: SettingsViewModel = createViewModel()) {
