@@ -12,12 +12,39 @@ import kotlinx.serialization.json.Json
 import okhttp3.ResponseBody
 import retrofit2.Response
 
+/**
+ * Base class for Retrofit remote data sources that standardizes JSON envelope decoding,
+ * HTTP error mapping, and coroutine cancellation handling.
+ *
+ * Choose the execution method that matches the level of response detail required:
+ * - [execute]: Default choice when only the unwrapped payload `T` is needed.
+ * - [executeForResponse]: When HTTP metadata (headers such as `Location` or `ETag`, status code,
+ *   or envelope message) is needed alongside the decoded payload `T`.
+ * - [executeRaw]: When the endpoint does not return the standard [ApiResponseBody] JSON envelope
+ *   (e.g., file downloads, binary streams, or plain text).
+ */
 abstract class RemoteDataSource(protected val json: Json) {
 
+    /**
+     * Executes [request], decodes the [ApiResponseBody.Success] envelope, and returns the unwrapped
+     * payload [T].
+     *
+     * Pass [Unit] as [T] for endpoints that succeed with an empty response body (e.g., HTTP 204).
+     * If HTTP headers or status codes are required, use [executeForResponse] instead.
+     */
     protected suspend inline fun <reified T> execute(
         crossinline request: suspend () -> Response<ResponseBody>,
     ): Result<T> = executeForResponse<T>(request).map { it.data }
 
+    /**
+     * Executes [request], decodes the [ApiResponseBody.Success] envelope, and returns the full
+     * [ApiResponse] containing [ApiResponse.data], [ApiResponse.message], [ApiResponse.code],
+     * and [ApiResponse.headers].
+     *
+     * Use this when response headers (e.g., `Location`, `ETag`, `X-Total-Count`) or the HTTP status
+     * code must be inspected. Pass [Unit] as [T] when the response body is empty (e.g., HTTP 201
+     * returning only a `Location` header).
+     */
     protected suspend inline fun <reified T> executeForResponse(
         crossinline request: suspend () -> Response<ResponseBody>,
     ): Result<ApiResponse<T>> {
@@ -46,6 +73,12 @@ abstract class RemoteDataSource(protected val json: Json) {
         }
     }
 
+    /**
+     * Executes [request] and returns the raw Retrofit [Response] without decoding the body as JSON.
+     *
+     * Non-2xx responses are still parsed into [ApiException], [EmptyErrorBodyException], or
+     * [NonJsonFormatException], and coroutine cancellation is preserved.
+     */
     protected suspend inline fun executeRaw(
         crossinline request: suspend () -> Response<ResponseBody>,
     ): Result<Response<ResponseBody>> {
@@ -63,6 +96,10 @@ abstract class RemoteDataSource(protected val json: Json) {
         }
     }
 
+    /**
+     * Parses a non-2xx [response] error body into an [ApiException], [EmptyErrorBodyException],
+     * or [NonJsonFormatException].
+     */
     protected fun parseError(response: Response<ResponseBody>): Exception {
         val errorString = response.errorBody()?.string()
 
@@ -81,6 +118,9 @@ abstract class RemoteDataSource(protected val json: Json) {
         }
     }
 
+    /**
+     * Maps a decoded [ApiResponseBody.Failure] envelope to an [ApiException].
+     */
     protected fun ApiResponseBody.Failure.toApiException(): ApiException {
         return ApiException(
             code = this.code,
