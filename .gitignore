@@ -21,3 +21,8 @@ CLAUDE.local.md
 GEMINI.local.md
 .gemini/settings.local.json
 .gemini/antigravity*/
+
+# Ignore IDE-generated wrapper in included build
+build-logic/gradlew
+build-logic/gradlew.bat
+build-logic/gradle/
