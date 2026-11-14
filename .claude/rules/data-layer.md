@@ -34,7 +34,7 @@ remote/               <Feature>RemoteDataSource extending core RemoteDataSource,
 
 ## Remote data sources
 
-- Extend `com.example.upk.core.data.remote.RemoteDataSource` and call APIs through `execute<T> { api.xxx() }` (or `executeForResponse<T>` / `executeRaw` when HTTP headers, status code or raw body are needed). It already handles success/error envelopes (`ApiResponseBody`), empty bodies and `APIException`; do not re-implement that logic.
+- Extend `com.example.upk.core.data.remote.RemoteDataSource` and call APIs through `execute<T> { api.xxx() }` (or `executeForResponse<T>` / `executeRaw` when HTTP headers, status code or raw body are needed). It already handles success/error envelopes (`ApiResponseBody`), empty bodies and `ApiException`; do not re-implement that logic.
 - Retrofit API interfaces return `Response<ResponseBody>`; decoding happens in `execute` / `executeForResponse`.
 - DTOs are `@Serializable` data classes under `remote/model/`, with `@SerialName` when the JSON key differs from the Kotlin name.
 - Never catch `CancellationException`; if you must catch `Exception`, call `currentCoroutineContext().ensureActive()` first (see `RemoteDataSource`).

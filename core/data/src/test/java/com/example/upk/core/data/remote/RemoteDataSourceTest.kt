@@ -4,7 +4,7 @@ import com.example.upk.core.common.CoreCommonModule
 import com.example.upk.core.common.errors.EmptyErrorBodyException
 import com.example.upk.core.common.errors.EmptyResponseBodyException
 import com.example.upk.core.common.errors.NonJsonFormatException
-import com.example.upk.core.common.network.APIException
+import com.example.upk.core.common.network.ApiException
 import com.example.upk.core.common.network.FieldError
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
@@ -172,10 +172,10 @@ class RemoteDataSourceTest {
     }
 
     @Test
-    fun `executeRaw parses error body into APIException on non 2xx response`() = runBlocking {
+    fun `executeRaw parses error body into ApiException on non 2xx response`() = runBlocking {
         val result = dataSource.fetchRaw { error(403, """{"message":"Forbidden","code":"FORBIDDEN"}""") }
 
-        val exception = result.exceptionOrNull() as APIException
+        val exception = result.exceptionOrNull() as ApiException
         assertEquals("FORBIDDEN", exception.code)
         assertEquals("Forbidden", exception.message)
     }
@@ -183,7 +183,7 @@ class RemoteDataSourceTest {
     // ---------- Error responses ----------
 
     @Test
-    fun `json error body becomes APIException with code message and field errors`() = runBlocking {
+    fun `json error body becomes ApiException with code message and field errors`() = runBlocking {
         val result = dataSource.fetchUser {
             error(
                 422,
@@ -191,17 +191,17 @@ class RemoteDataSourceTest {
             )
         }
 
-        val exception = result.exceptionOrNull() as APIException
+        val exception = result.exceptionOrNull() as ApiException
         assertEquals("VALIDATION", exception.code)
         assertEquals("Validation failed", exception.message)
         assertEquals(listOf(FieldError("name", "required")), exception.fieldErrors)
     }
 
     @Test
-    fun `json error body without optional fields becomes APIException with defaults`() = runBlocking {
+    fun `json error body without optional fields becomes ApiException with defaults`() = runBlocking {
         val result = dataSource.fetchUser { error(404, """{"message":"Not found"}""") }
 
-        val exception = result.exceptionOrNull() as APIException
+        val exception = result.exceptionOrNull() as ApiException
         assertEquals("Not found", exception.message)
         assertEquals(null, exception.code)
         assertTrue(exception.fieldErrors.isEmpty())

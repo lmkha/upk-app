@@ -2,7 +2,7 @@ package com.example.upk.payment.ui
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.upk.core.common.network.APIException
+import com.example.upk.core.common.network.ApiException
 import com.example.upk.payment.domain.usecases.CreateBindingUseCase
 import com.stripe.android.paymentsheet.CreateIntentResult
 import com.stripe.android.paymentsheet.PaymentSheetResult
@@ -22,7 +22,7 @@ class AddPaymentBindingViewModel @Inject constructor(
             },
             onFailure = { throwable ->
                 when (throwable) {
-                    is APIException -> {
+                    is ApiException -> {
                         Log.d("CHECK_VAR", "errors: ${throwable.fieldErrors}")
                         CreateIntentResult.Failure(
                             cause = Exception("Empty client secret"),

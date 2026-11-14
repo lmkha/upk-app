@@ -3,7 +3,7 @@ package com.example.upk.core.data.remote
 import com.example.upk.core.common.errors.EmptyErrorBodyException
 import com.example.upk.core.common.errors.EmptyResponseBodyException
 import com.example.upk.core.common.errors.NonJsonFormatException
-import com.example.upk.core.common.network.APIException
+import com.example.upk.core.common.network.ApiException
 import com.example.upk.core.common.network.ApiResponseBody
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -81,8 +81,8 @@ abstract class RemoteDataSource(protected val json: Json) {
         }
     }
 
-    protected fun ApiResponseBody.Failure.toApiException(): APIException {
-        return APIException(
+    protected fun ApiResponseBody.Failure.toApiException(): ApiException {
+        return ApiException(
             code = this.code,
             message = this.message,
             fieldErrors = this.fieldErrors,

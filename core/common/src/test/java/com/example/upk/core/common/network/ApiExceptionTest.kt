@@ -5,11 +5,11 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class APIExceptionTest {
+class ApiExceptionTest {
 
     @Test
     fun `exposes message code and field errors`() {
-        val exception = APIException(
+        val exception = ApiException(
             code = "AUTH_001",
             message = "Token expired",
             fieldErrors = listOf(FieldError("token", "expired")),
@@ -21,8 +21,8 @@ class APIExceptionTest {
     }
 
     @Test
-    fun `message and code default to null`() {
-        val exception = APIException(fieldErrors = emptyList())
+    fun `message code and fieldErrors default to null and emptyList`() {
+        val exception = ApiException()
 
         assertNull(exception.message)
         assertNull(exception.code)
@@ -31,9 +31,10 @@ class APIExceptionTest {
 
     @Test
     fun `is an Exception so it can be thrown and caught`() {
-        val caught = runCatching { throw APIException(message = "x", fieldErrors = emptyList()) }
+        val caught = runCatching { throw ApiException(message = "x") }
             .exceptionOrNull()
 
-        assertTrue(caught is APIException)
+        assertTrue(caught is ApiException)
+        assertEquals("x", caught?.message)
     }
 }
