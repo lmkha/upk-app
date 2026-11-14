@@ -28,7 +28,7 @@ import retrofit2.Response
 import java.io.IOException
 
 /**
- * callApi, callApiResponse and executeRaw are protected, so a small subclass exposes them.
+ * execute, executeForResponse and executeRaw are protected, so a small subclass exposes them.
  * Responses are built with retrofit2.Response.success/error, exactly what a Retrofit API
  * interface would return.
  */
@@ -39,18 +39,18 @@ class RemoteDataSourceTest {
 
     private class TestRemoteDataSource : RemoteDataSource(CoreCommonModule.provideJson()) {
         suspend fun fetchUser(request: suspend () -> Response<ResponseBody>): Result<UserDto> =
-            callApi { request() }
+            execute { request() }
 
         suspend fun fetchNothing(request: suspend () -> Response<ResponseBody>): Result<Unit> =
-            callApi { request() }
+            execute { request() }
 
         suspend fun fetchUserResponse(
             request: suspend () -> Response<ResponseBody>,
-        ): Result<ApiResponse<UserDto>> = callApiResponse { request() }
+        ): Result<ApiResponse<UserDto>> = executeForResponse { request() }
 
         suspend fun fetchNothingResponse(
             request: suspend () -> Response<ResponseBody>,
-        ): Result<ApiResponse<Unit>> = callApiResponse { request() }
+        ): Result<ApiResponse<Unit>> = executeForResponse { request() }
 
         suspend fun fetchRaw(
             request: suspend () -> Response<ResponseBody>,
@@ -110,10 +110,10 @@ class RemoteDataSourceTest {
         assertTrue(result.exceptionOrNull() is SerializationException)
     }
 
-    // ---------- Full parsed responses (callApiResponse) ----------
+    // ---------- Full parsed responses (executeForResponse) ----------
 
     @Test
-    fun `callApiResponse preserves data envelope message status code and headers`() = runBlocking {
+    fun `executeForResponse preserves data envelope message status code and headers`() = runBlocking {
         val headers = headersOf("Location", "/api/v1/users/7", "ETag", "\"v1\"")
 
         val result = dataSource.fetchUserResponse {
@@ -133,7 +133,7 @@ class RemoteDataSourceTest {
     }
 
     @Test
-    fun `callApiResponse with empty body and Unit type preserves status code and Location header`() = runBlocking {
+    fun `executeForResponse with empty body and Unit type preserves status code and Location header`() = runBlocking {
         val headers = headersOf("Location", "https://pay.example.com/session/abc")
 
         val result = dataSource.fetchNothingResponse {
@@ -250,7 +250,7 @@ class RemoteDataSourceTest {
             deferred.await()
             fail("expected CancellationException")
         } catch (expected: CancellationException) {
-            // callApi must not swallow cancellation into a Result.failure
+            // execute must not swallow cancellation into a Result.failure
         }
     }
 

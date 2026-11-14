@@ -14,6 +14,6 @@ class AuthRemoteDataSourceImpl @Inject constructor(
     json: Json
 ): RemoteDataSource(json), AuthRemoteDataSource {
     override suspend fun refreshToken(refreshToken: String): Result<RefreshTokenDto> {
-        return callApi { authApi.refreshToken(RefreshTokenRequest(refreshToken)) }
+        return execute { authApi.refreshToken(RefreshTokenRequest(refreshToken)) }
     }
 }

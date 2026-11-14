@@ -15,10 +15,10 @@ class PaymentRemoteDataSourceImpl @Inject constructor(
     json: Json
 ): RemoteDataSource(json), PaymentRemoteDataSource {
     override suspend fun createBinding(): Result<CreatePaymentBindingDto> {
-        return callApi { paymentApi.createBinding(CreateBindingRequest()) }
+        return execute { paymentApi.createBinding(CreateBindingRequest()) }
     }
 
     override suspend fun getAvailablePaymentProviders(): Result<List<PaymentProviderDto>> {
-        return callApi { paymentApi.getAvailablePaymentProviders() }
+        return execute { paymentApi.getAvailablePaymentProviders() }
     }
 }

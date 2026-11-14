@@ -14,11 +14,11 @@ import retrofit2.Response
 
 abstract class RemoteDataSource(protected val json: Json) {
 
-    protected suspend inline fun <reified T> callApi(
+    protected suspend inline fun <reified T> execute(
         crossinline request: suspend () -> Response<ResponseBody>,
-    ): Result<T> = callApiResponse<T>(request).map { it.data }
+    ): Result<T> = executeForResponse<T>(request).map { it.data }
 
-    protected suspend inline fun <reified T> callApiResponse(
+    protected suspend inline fun <reified T> executeForResponse(
         crossinline request: suspend () -> Response<ResponseBody>,
     ): Result<ApiResponse<T>> {
         return executeRaw(request).mapCatching { response ->
@@ -55,7 +55,7 @@ abstract class RemoteDataSource(protected val json: Json) {
             if (response.isSuccessful) {
                 Result.success(response)
             } else {
-                Result.failure(parseErrorResponse(response))
+                Result.failure(parseError(response))
             }
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
@@ -63,7 +63,7 @@ abstract class RemoteDataSource(protected val json: Json) {
         }
     }
 
-    protected fun parseErrorResponse(response: Response<ResponseBody>): Exception {
+    protected fun parseError(response: Response<ResponseBody>): Exception {
         val errorString = response.errorBody()?.string()
 
         if (errorString.isNullOrBlank()) {

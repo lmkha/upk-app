@@ -11,7 +11,7 @@ Arguments: `<feature> <Name>` for a new repository, or `<feature> <ExistingRepos
 
 1. Domain: `feature/<feature>/domain/.../repository/<Name>Repository.kt` interface. Observing methods return `Flow<T>`, writes are `suspend fun`. Only domain models in signatures.
 2. Data: `feature/<feature>/data/.../repository/<Name>RepositoryImpl.kt` with `@Inject constructor(dataSources...)`. Mapping proto/DTO -> domain happens here in private `mapToDomainXxx` functions; `when` over proto enums handles `UNSPECIFIED` and `UNRECOGNIZED`.
-3. If the repository needs a new data source, add `local/datasource/<Name>LocalDataSource` (+Impl) or `remote/<Name>RemoteDataSource` extending `core.data.remote.RemoteDataSource` and using `callApi`.
+3. If the repository needs a new data source, add `local/datasource/<Name>LocalDataSource` (+Impl) or `remote/<Name>RemoteDataSource` extending `core.data.remote.RemoteDataSource` and using `execute`.
 4. DI: in `feature/<feature>/data/.../di/<Feature>DataModule.kt` add `@Binds @Singleton abstract fun bind<Name>Repository(impl: <Name>RepositoryImpl): <Name>Repository` (and bindings for new data sources). Create the module if it does not exist.
 5. Tests:
    - `domain/src/test/.../Fake<Name>Repository.kt` (in-memory, call counters, `private set`).
