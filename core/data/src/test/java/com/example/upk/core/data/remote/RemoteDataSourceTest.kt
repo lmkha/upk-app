@@ -12,7 +12,11 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.Serializable
+import okhttp3.Headers
+import okhttp3.Headers.Companion.headersOf
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.Protocol
+import okhttp3.Request
 import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
@@ -24,8 +28,9 @@ import retrofit2.Response
 import java.io.IOException
 
 /**
- * callApi is protected, so a small subclass exposes it. Responses are built with
- * retrofit2.Response.success/error, exactly what a Retrofit API interface would return.
+ * callApi, callApiResponse and executeRaw are protected, so a small subclass exposes them.
+ * Responses are built with retrofit2.Response.success/error, exactly what a Retrofit API
+ * interface would return.
  */
 class RemoteDataSourceTest {
 
@@ -38,12 +43,38 @@ class RemoteDataSourceTest {
 
         suspend fun fetchNothing(request: suspend () -> Response<ResponseBody>): Result<Unit> =
             callApi { request() }
+
+        suspend fun fetchUserResponse(
+            request: suspend () -> Response<ResponseBody>,
+        ): Result<ApiResponse<UserDto>> = callApiResponse { request() }
+
+        suspend fun fetchNothingResponse(
+            request: suspend () -> Response<ResponseBody>,
+        ): Result<ApiResponse<Unit>> = callApiResponse { request() }
+
+        suspend fun fetchRaw(
+            request: suspend () -> Response<ResponseBody>,
+        ): Result<Response<ResponseBody>> = executeRaw { request() }
     }
 
     private val dataSource = TestRemoteDataSource()
     private val jsonType = "application/json".toMediaType()
 
-    private fun ok(body: String): Response<ResponseBody> = Response.success(body.toResponseBody(jsonType))
+    private fun ok(
+        body: String,
+        code: Int = 200,
+        headers: Headers = Headers.EMPTY,
+    ): Response<ResponseBody> {
+        val rawResponse = okhttp3.Response.Builder()
+            .request(Request.Builder().url("http://localhost/test").build())
+            .protocol(Protocol.HTTP_1_1)
+            .code(code)
+            .message("OK")
+            .headers(headers)
+            .build()
+        return Response.success(body.toResponseBody(jsonType), rawResponse)
+    }
+
     private fun error(code: Int, body: String): Response<ResponseBody> =
         Response.error(code, body.toResponseBody(jsonType))
 
@@ -77,6 +108,76 @@ class RemoteDataSourceTest {
         val result = dataSource.fetchUser { ok("""{"data":{"id":"not-a-number"}}""") }
 
         assertTrue(result.exceptionOrNull() is SerializationException)
+    }
+
+    // ---------- Full parsed responses (callApiResponse) ----------
+
+    @Test
+    fun `callApiResponse preserves data envelope message status code and headers`() = runBlocking {
+        val headers = headersOf("Location", "/api/v1/users/7", "ETag", "\"v1\"")
+
+        val result = dataSource.fetchUserResponse {
+            ok(
+                body = """{"data":{"id":7,"name":"Kha"},"message":"Created"}""",
+                code = 201,
+                headers = headers,
+            )
+        }
+
+        val response = result.getOrThrow()
+        assertEquals(UserDto(7, "Kha"), response.data)
+        assertEquals("Created", response.message)
+        assertEquals(201, response.code)
+        assertEquals("/api/v1/users/7", response.headers["Location"])
+        assertEquals("\"v1\"", response.headers["ETag"])
+    }
+
+    @Test
+    fun `callApiResponse with empty body and Unit type preserves status code and Location header`() = runBlocking {
+        val headers = headersOf("Location", "https://pay.example.com/session/abc")
+
+        val result = dataSource.fetchNothingResponse {
+            ok(
+                body = "",
+                code = 201,
+                headers = headers,
+            )
+        }
+
+        val response = result.getOrThrow()
+        assertEquals(Unit, response.data)
+        assertEquals(null, response.message)
+        assertEquals(201, response.code)
+        assertEquals("https://pay.example.com/session/abc", response.headers["Location"])
+    }
+
+    // ---------- Raw responses (executeRaw) ----------
+
+    @Test
+    fun `executeRaw returns raw Retrofit response without decoding json envelope`() = runBlocking {
+        val headers = headersOf("Content-Disposition", "attachment; filename=\"invoice.txt\"")
+
+        val result = dataSource.fetchRaw {
+            ok(
+                body = "plain-text-content",
+                code = 200,
+                headers = headers,
+            )
+        }
+
+        val response = result.getOrThrow()
+        assertEquals(200, response.code())
+        assertEquals("attachment; filename=\"invoice.txt\"", response.headers()["Content-Disposition"])
+        assertEquals("plain-text-content", response.body()!!.string())
+    }
+
+    @Test
+    fun `executeRaw parses error body into APIException on non 2xx response`() = runBlocking {
+        val result = dataSource.fetchRaw { error(403, """{"message":"Forbidden","code":"FORBIDDEN"}""") }
+
+        val exception = result.exceptionOrNull() as APIException
+        assertEquals("FORBIDDEN", exception.code)
+        assertEquals("Forbidden", exception.message)
     }
 
     // ---------- Error responses ----------

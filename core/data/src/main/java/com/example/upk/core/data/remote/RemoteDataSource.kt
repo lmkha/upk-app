@@ -15,50 +15,69 @@ import retrofit2.Response
 abstract class RemoteDataSource(protected val json: Json) {
 
     protected suspend inline fun <reified T> callApi(
-        crossinline request: suspend () -> Response<ResponseBody>
-    ): Result<T> {
+        crossinline request: suspend () -> Response<ResponseBody>,
+    ): Result<T> = callApiResponse<T>(request).map { it.data }
+
+    protected suspend inline fun <reified T> callApiResponse(
+        crossinline request: suspend () -> Response<ResponseBody>,
+    ): Result<ApiResponse<T>> {
+        return executeRaw(request).mapCatching { response ->
+            val successString = response.body()?.string()
+
+            if (successString.isNullOrBlank()) {
+                if (Unit is T) {
+                    ApiResponse(
+                        data = Unit as T,
+                        code = response.code(),
+                        headers = response.headers(),
+                    )
+                } else {
+                    throw EmptyResponseBodyException(httpCode = response.code())
+                }
+            } else {
+                val body = json.decodeFromString<ApiResponseBody.Success<T>>(successString)
+                ApiResponse(
+                    data = body.data,
+                    message = body.message,
+                    code = response.code(),
+                    headers = response.headers(),
+                )
+            }
+        }
+    }
+
+    protected suspend inline fun executeRaw(
+        crossinline request: suspend () -> Response<ResponseBody>,
+    ): Result<Response<ResponseBody>> {
         return try {
             val response = request()
 
             if (response.isSuccessful) {
-                val successString = response.body()?.string()
-
-                if (successString.isNullOrBlank()) {
-                    return if (Unit is T) {
-                        Result.success(Unit as T)
-                    } else {
-                        Result.failure(EmptyResponseBodyException(httpCode = response.code()))
-                    }
-                }
-
-                val body = json.decodeFromString<ApiResponseBody.Success<T>>(successString)
-                Result.success(body.data)
-
+                Result.success(response)
             } else {
-                val errorString = response.errorBody()?.string()
-
-                if (errorString.isNullOrBlank()) {
-                    return Result.failure(
-                        EmptyErrorBodyException(
-                            httpCode = response.code(),
-                            httpMessage = response.message()
-                        )
-                    )
-                }
-
-                val exception = try {
-                    val errorBody = json.decodeFromString<ApiResponseBody.Failure>(errorString)
-                    errorBody.toApiException()
-                } catch (e: SerializationException) {
-                    NonJsonFormatException(response.code(), errorString, e)
-                }
-
-                Result.failure(exception)
+                Result.failure(parseErrorResponse(response))
             }
-
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
             Result.failure(e)
+        }
+    }
+
+    protected fun parseErrorResponse(response: Response<ResponseBody>): Exception {
+        val errorString = response.errorBody()?.string()
+
+        if (errorString.isNullOrBlank()) {
+            return EmptyErrorBodyException(
+                httpCode = response.code(),
+                httpMessage = response.message(),
+            )
+        }
+
+        return try {
+            val errorBody = json.decodeFromString<ApiResponseBody.Failure>(errorString)
+            errorBody.toApiException()
+        } catch (e: SerializationException) {
+            NonJsonFormatException(response.code(), errorString, e)
         }
     }
 
@@ -66,7 +85,7 @@ abstract class RemoteDataSource(protected val json: Json) {
         return APIException(
             code = this.code,
             message = this.message,
-            fieldErrors = this.fieldErrors
+            fieldErrors = this.fieldErrors,
         )
     }
 }
