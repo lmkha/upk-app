@@ -17,7 +17,7 @@ val secretsFile = rootProject.file("secrets.properties")
 if (!secretsFile.isFile) {
     throw GradleException(
         "secrets.properties not found. Copy secrets.properties.example to secrets.properties " +
-            "and fill in the values of the environment you want to build."
+            "and fill in the values of the environment you want to build. See README.md."
     )
 }
 val secretProperties = Properties().apply {
