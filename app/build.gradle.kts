@@ -2,13 +2,13 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.upkFlavors)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
-    alias(libs.plugins.secrets)
 }
 
 android {
@@ -27,27 +27,16 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    // One flavor per backend environment. Only the app module has flavors;
-    // library modules stay flavorless and receive the base URL through Hilt (@ApiBaseUrl).
-    //
-    // Per-environment values are not declared here. The secrets plugin turns every key of
-    // local.properties into a BuildConfig field, then overrides it with the keys found in
-    // <flavor>.properties (dev.properties, staging.properties, prod.properties) at the
-    // repository root. Adding a value means adding a key to those files, not editing this block.
-    flavorDimensions += "environment"
+    // The dev, staging and prod flavors are declared by the upk.flavors convention plugin.
+    // Only what is specific to the installable app is configured here.
     productFlavors {
-        create("dev") {
-            dimension = "environment"
+        getByName("dev") {
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
         }
-        create("staging") {
-            dimension = "environment"
+        getByName("staging") {
             applicationIdSuffix = ".staging"
             versionNameSuffix = "-staging"
-        }
-        create("prod") {
-            dimension = "environment"
         }
     }
 
@@ -68,7 +57,6 @@ android {
     }
     buildFeatures {
         compose = true
-        buildConfig = true
     }
 }
 
