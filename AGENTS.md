@@ -74,13 +74,13 @@ Detailed rules for writing tests and fakes are in `.claude/rules/testing.md` (mi
 - `secrets.properties.example` (committed) lists the key names without values. When a key is added or removed, update that file in the same change.
 - `ENVIRONMENT` (`dev`, `staging` or `prod`) is mandatory. `app/build.gradle.kts` fails the build when the file or the key is missing, and derives `applicationIdSuffix`, `versionNameSuffix` and the `app_name` string from it. Do not add separate keys for those.
 - The secrets Gradle plugin turns every key of `secrets.properties` into a `BuildConfig` field of the module that applies it. A module that needs such a value applies `alias(libs.plugins.secrets)`, sets `buildFeatures { buildConfig = true }` and `secrets { propertiesFileName = "secrets.properties" }`, then reads its own `BuildConfig` (see `core/data` and `NetworkModule`). Do not pass these values between modules through Hilt providers or wrapper classes, and do not write `buildConfigField` lines by hand.
-- To add a per-environment value, add the key to `secrets.properties` and `secrets.properties.example`, and update the `PROPERTIES` secret in each GitHub Environment. CI appends `ENVIRONMENT` itself, so it always matches the GitHub Environment of the job.
+- To add a per-environment value, add the key to `secrets.properties` and `secrets.properties.example`, and update the `SECRETS_PROPERTIES` secret in each GitHub Environment. CI appends `ENVIRONMENT` itself, so it always matches the GitHub Environment of the job.
 - `app/google-services.json` (git-ignored) must contain a client for the `applicationId` being built.
 
 CI:
 
 - `.github/workflows/pr-check.yml` runs on every pull request to `main` or `develop`, in the `develop` environment: `testDebugUnitTest`, `lintDebug`, `:app:assembleDebug` and `assembleDebugAndroidTest`. Run the same tasks locally before opening a PR.
-- `.github/workflows/build-apk.yml` builds the APK of one environment: push to `develop` builds dev (`assembleDebug`), push to `main` builds prod (`assembleRelease`), a manual run builds the selected environment. Each GitHub Environment holds its own `PROPERTIES` and `GOOGLE_SERVICES_JSON` secrets.
+- `.github/workflows/build-apk.yml` builds the APK of one environment: push to `develop` builds dev (`assembleDebug`), push to `main` builds prod (`assembleRelease`), a manual run builds the selected environment. Each GitHub Environment holds its own `SECRETS_PROPERTIES` and `GOOGLE_SERVICES_JSON` secrets.
 
 Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML reports: `<module>/build/reports/tests/testDebugUnitTest/index.html`.
 

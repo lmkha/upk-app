@@ -1,7 +1,7 @@
 name: Build APK
 
 # Builds the APK of one environment. Each GitHub Environment (develop, staging,
-# production) owns its own PROPERTIES and GOOGLE_SERVICES_JSON secrets.
+# production) owns its own SECRETS_PROPERTIES and GOOGLE_SERVICES_JSON secrets.
 #
 #   push to develop  -> develop environment
 #   push to main     -> production environment
@@ -88,18 +88,18 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       # secrets.properties is the file the secrets Gradle plugin and app/build.gradle.kts read.
-      # The PROPERTIES secret holds the whole file of the selected environment. ENVIRONMENT is
+      # The SECRETS_PROPERTIES secret holds the whole file of the selected environment. ENVIRONMENT is
       # appended here so it always matches the GitHub Environment this job runs in.
       - name: Generate secrets.properties from environment secrets
         env:
-          PROPERTIES: ${{ secrets.PROPERTIES }}
+          SECRETS_PROPERTIES: ${{ secrets.SECRETS_PROPERTIES }}
           APP_ENVIRONMENT: ${{ steps.variant.outputs.app_environment }}
         run: |
-          if [ -z "${PROPERTIES}" ]; then
-            echo "PROPERTIES is not set for this environment." >&2
+          if [ -z "${SECRETS_PROPERTIES}" ]; then
+            echo "SECRETS_PROPERTIES is not set for this environment." >&2
             exit 1
           fi
-          printf '%s\n' "${PROPERTIES}" > secrets.properties
+          printf '%s\n' "${SECRETS_PROPERTIES}" > secrets.properties
           echo "ENVIRONMENT=${APP_ENVIRONMENT}" >> secrets.properties
 
       - name: Generate google-services.json from environment secrets
