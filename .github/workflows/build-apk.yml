@@ -1,31 +1,82 @@
 name: Build APK
 
+# Builds the APK of one environment. Each GitHub Environment (develop, staging,
+# production) owns its own API_URL and GOOGLE_SERVICES_JSON secrets.
+#
+#   push to develop  -> develop environment
+#   push to main     -> production environment
+#   manual run       -> the environment picked in the dropdown
 on:
+  push:
+    branches:
+      - develop
+      - main
   workflow_dispatch:
     inputs:
-      build_type:
-        description: "Build variant"
+      environment:
+        description: "Target environment"
         required: true
-        default: "debug"
+        default: "develop"
         type: choice
         options:
-          - debug
-          - release
+          - develop
+          - staging
+          - production
       run_tests:
         description: "Run unit tests before building APK"
         required: true
         default: true
         type: boolean
 
+permissions:
+  contents: read
+
 jobs:
   build:
-    name: Build ${{ inputs.build_type }} APK
+    name: Build ${{ inputs.environment || (github.ref_name == 'main' && 'production' || 'develop') }} APK
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Selects which environment's secrets are used. Protection rules configured
+    # on the environment (required reviewers, allowed branches) apply to this job.
+    environment: ${{ inputs.environment || (github.ref_name == 'main' && 'production' || 'develop') }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # The environment decides both the product flavor and the build type.
+      - name: Resolve build variant
+        id: variant
+        env:
+          TARGET_ENVIRONMENT: ${{ inputs.environment || (github.ref_name == 'main' && 'production' || 'develop') }}
+        run: |
+          case "${TARGET_ENVIRONMENT}" in
+            develop)
+              flavor=dev; build_type=debug
+              assemble_task=":app:assembleDevDebug"
+              test_task=":app:testDevDebugUnitTest"
+              ;;
+            staging)
+              flavor=staging; build_type=release
+              assemble_task=":app:assembleStagingRelease"
+              test_task=":app:testStagingDebugUnitTest"
+              ;;
+            production)
+              flavor=prod; build_type=release
+              assemble_task=":app:assembleProdRelease"
+              test_task=":app:testProdDebugUnitTest"
+              ;;
+            *)
+              echo "Unknown environment: ${TARGET_ENVIRONMENT}" >&2
+              exit 1
+              ;;
+          esac
+          {
+            echo "flavor=${flavor}"
+            echo "build_type=${build_type}"
+            echo "assemble_task=${assemble_task}"
+            echo "test_task=${test_task}"
+          } >> "${GITHUB_OUTPUT}"
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -36,30 +87,34 @@ jobs:
       - name: Setup Gradle with caching
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Generate local.properties and google-services.json from GitHub Secrets
+      # local.properties is the base file the secrets Gradle plugin reads for every flavor.
+      # Each job builds one environment, so its values go straight into that file.
+      # A new per-environment value needs one more env entry and echo line here.
+      - name: Generate local.properties and google-services.json from environment secrets
         env:
           API_URL: ${{ secrets.API_URL }}
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
+          if [ -z "${API_URL}" ] || [ -z "${GOOGLE_SERVICES_JSON}" ]; then
+            echo "API_URL or GOOGLE_SERVICES_JSON is not set for this environment." >&2
+            exit 1
+          fi
           echo "API_URL=\"${API_URL}\"" >> local.properties
           echo "${GOOGLE_SERVICES_JSON}" > app/google-services.json
 
-      - name: Run Unit Tests
-        if: ${{ inputs.run_tests }}
-        run: ./gradlew testDebugUnitTest
+      # Library modules have no flavors, so their task is testDebugUnitTest;
+      # the app module runs the tests of the flavor being built.
+      - name: Run unit tests
+        if: ${{ github.event_name == 'push' || inputs.run_tests }}
+        run: ./gradlew testDebugUnitTest ${{ steps.variant.outputs.test_task }}
 
-      - name: Build Debug APK
-        if: ${{ inputs.build_type == 'debug' }}
-        run: ./gradlew :app:assembleDebug
-
-      - name: Build Release APK
-        if: ${{ inputs.build_type == 'release' }}
-        run: ./gradlew :app:assembleRelease
+      - name: Build APK
+        run: ./gradlew ${{ steps.variant.outputs.assemble_task }}
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: upk-${{ inputs.build_type }}-apk
-          path: app/build/outputs/apk/${{ inputs.build_type }}/*.apk
+          name: upk-${{ steps.variant.outputs.flavor }}-${{ steps.variant.outputs.build_type }}-apk
+          path: app/build/outputs/apk/${{ steps.variant.outputs.flavor }}/${{ steps.variant.outputs.build_type }}/*.apk
           if-no-files-found: error
           retention-days: 14

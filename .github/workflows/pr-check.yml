@@ -19,9 +19,14 @@ permissions:
 
 jobs:
   verify:
+    # Branch protection requires a status check with this exact name; do not rename the job.
     name: Unit tests, lint and debug build
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Pull requests are always verified against the develop environment (dev flavor).
+    # Secrets are not passed to pull requests opened from forks, so this job
+    # only works for branches pushed to this repository.
+    environment: develop
 
     steps:
       - name: Checkout repository
@@ -36,25 +41,32 @@ jobs:
       - name: Setup Gradle with caching
         uses: gradle/actions/setup-gradle@v4
 
-      # Secrets are not passed to pull requests opened from forks, so this job
-      # only works for branches pushed to this repository.
-      - name: Generate local.properties and google-services.json from GitHub Secrets
+      # local.properties is the base file the secrets Gradle plugin reads for every flavor.
+      # Each job builds one environment, so its values go straight into that file.
+      # A new per-environment value needs one more env entry and echo line here.
+      - name: Generate local.properties and google-services.json from environment secrets
         env:
           API_URL: ${{ secrets.API_URL }}
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
+          if [ -z "${API_URL}" ] || [ -z "${GOOGLE_SERVICES_JSON}" ]; then
+            echo "API_URL or GOOGLE_SERVICES_JSON is not set for the develop environment." >&2
+            exit 1
+          fi
           echo "API_URL=\"${API_URL}\"" >> local.properties
           echo "${GOOGLE_SERVICES_JSON}" > app/google-services.json
 
+      # Library modules have no flavors (testDebugUnitTest, lintDebug);
+      # the app module is checked with its dev flavor (testDevDebugUnitTest, lintDevDebug).
       - name: Run unit tests
-        run: ./gradlew testDebugUnitTest
+        run: ./gradlew testDebugUnitTest :app:testDevDebugUnitTest
 
       - name: Run Android lint
-        run: ./gradlew lintDebug
+        run: ./gradlew lintDebug :app:lintDevDebug
 
       # Instrumented tests need an emulator, so they are only compiled here.
       - name: Build debug APK and compile instrumented tests
-        run: ./gradlew :app:assembleDebug assembleDebugAndroidTest
+        run: ./gradlew :app:assembleDevDebug assembleDebugAndroidTest :app:assembleDevDebugAndroidTest
 
       - name: Upload test and lint reports
         if: ${{ failure() }}
@@ -62,7 +74,7 @@ jobs:
         with:
           name: pr-check-reports
           path: |
-            **/build/reports/tests/testDebugUnitTest/
-            **/build/reports/lint-results-debug.html
+            **/build/reports/tests/
+            **/build/reports/lint-results-*.html
           if-no-files-found: ignore
           retention-days: 7
