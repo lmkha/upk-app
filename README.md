@@ -90,7 +90,7 @@ Each GitHub Environment (`develop`, `staging`, `production`) holds two secrets: 
 - Run the pull request checks locally before pushing:
 
   ```bash
-  ./gradlew testDebugUnitTest lintDebug :app:assembleDebug assembleDebugAndroidTest
+  ./gradlew testDebugUnitTest lintDebug :app:assembleDebug compileDebugAndroidTestKotlin
   ```
 
 - Coding rules, architecture conventions and step-by-step workflows are in [AGENTS.md](AGENTS.md). They are written for AI coding agents and apply to human contributors as well.
