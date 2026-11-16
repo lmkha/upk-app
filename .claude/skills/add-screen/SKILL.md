@@ -21,7 +21,7 @@ Arguments: `<feature> <ScreenName>` (e.g. `payment PaymentHistory`). The feature
 5. Tests:
    - `ui/src/test/.../<ScreenName>ViewModelTest.kt`: initial state, data loaded, each intent, error path and default error message. Use `MainDispatcherRule` and the feature's fake repository; create it under `ui/src/test` if missing.
    - `ui/src/androidTest/.../<ScreenName>ScreenTest.kt`: renders loaded state, loading indicator, one interaction, error + dismiss. Use `androidx.compose.ui.test.junit4.v2.createComposeRule`. Add `androidTestImplementation(libs.androidx.ui.test.junit4)` and `debugImplementation(libs.androidx.ui.test.manifest)` to the ui module if absent.
-6. Run `./gradlew :feature:<feature>:ui:testDebugUnitTest :feature:<feature>:ui:assembleDebugAndroidTest :app:assembleDevDebug`.
+6. Run `./gradlew :feature:<feature>:ui:testDevDebugUnitTest :feature:<feature>:ui:assembleDevDebugAndroidTest :app:assembleDevDebug`.
 7. Finish with the file list and:
    ```bash
    git add feature/<feature>/ui app/src/main/java/com/example/upk/ui

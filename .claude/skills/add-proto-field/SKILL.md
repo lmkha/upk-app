@@ -21,7 +21,7 @@ Arguments: `<feature> <field_name> <type>` (e.g. `settings notifications_enabled
    - `<Feature>RepositoryImplTest`: every enum branch, default mapping, round trip.
    - `AppSettingsPreferencesSerializerTest` (or the feature's serializer test): round trip with the new field set.
    - Use case tests.
-9. Run `./gradlew :feature:<feature>:data:testDebugUnitTest :feature:<feature>:domain:testDebugUnitTest :feature:<feature>:ui:testDebugUnitTest`.
+9. Run `./gradlew :feature:<feature>:data:testDevDebugUnitTest :feature:<feature>:domain:testDevDebugUnitTest :feature:<feature>:ui:testDevDebugUnitTest`.
 10. Finish with the file list and:
     ```bash
     git add feature/<feature>

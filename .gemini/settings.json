@@ -12,7 +12,7 @@
   },
   "tools": {
     "allowed": [
-      "run_shell_command(./gradlew testDebugUnitTest)",
+      "run_shell_command(./gradlew testDevDebugUnitTest)",
       "run_shell_command(./gradlew :app:assembleDevDebug)",
       "run_shell_command(./gradlew :app:testDevDebugUnitTest)",
       "run_shell_command(./gradlew :core:)",

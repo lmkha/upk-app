@@ -30,7 +30,7 @@ Target: working tree by default, or a branch / PR number if given (`gh pr diff <
    **Tests**
    - Every new use case / repository / data source / ViewModel has unit tests; new screens have a Compose test.
    - Fakes updated for interface changes; tests assert behaviour, not implementation details; names are backtick sentences in English.
-   - Tests actually ran: ask for or run `./gradlew :<module>:testDebugUnitTest`.
+   - Tests actually ran: ask for or run `./gradlew :<module>:testDevDebugUnitTest`.
 
    **Conventions**
    - English identifiers/comments/strings; no wildcard imports; Material 3 only; secrets not committed.

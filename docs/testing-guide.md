@@ -232,24 +232,24 @@ Những gì nên test ở ViewModel:
 
 ```bash
 # Một module
-./gradlew :feature:settings:domain:testDebugUnitTest
+./gradlew :feature:settings:domain:testDevDebugUnitTest
 
 # Ép chạy lại dù code không đổi
-./gradlew :feature:settings:domain:testDebugUnitTest --rerun
+./gradlew :feature:settings:domain:testDevDebugUnitTest --rerun
 
 # Chỉ một class
-./gradlew :feature:settings:domain:testDebugUnitTest --tests "*ThemeModeTest"
+./gradlew :feature:settings:domain:testDevDebugUnitTest --tests "*ThemeModeTest"
 
-# Toàn bộ project (module app có flavor nên tên task khác các module còn lại)
-./gradlew testDebugUnitTest :app:testDevDebugUnitTest
+# Toàn bộ project (mọi module đều có flavor dev / staging / prod, ở đây chạy flavor dev)
+./gradlew testDevDebugUnitTest
 ```
 
 Hành vi mặc định của Gradle cần biết:
 
 - **Chỉ in test fail**, test pass im lặng và chỉ báo `BUILD SUCCESSFUL`.
 - **Không chạy lại nếu code không đổi** (`up-to-date`), dùng `--rerun` để ép.
-- Báo cáo HTML: `<module>/build/reports/tests/testDebugUnitTest/index.html`.
-- Báo cáo XML: `<module>/build/test-results/testDebugUnitTest/`.
+- Báo cáo HTML: `<module>/build/reports/tests/testDevDebugUnitTest/index.html`.
+- Báo cáo XML: `<module>/build/test-results/testDevDebugUnitTest/`.
 
 Trong Android Studio: bấm nút ▶ cạnh tên class hoặc tên hàm test.
 
@@ -286,7 +286,7 @@ Kết quả thực tế của feature settings: `SettingsViewModel` 100% line v�
 | Android framework | Không có | Đầy đủ |
 | Tốc độ | Mili giây | Vài giây đến vài phút, phải cài APK |
 | Dùng cho | Logic thuần: use case, repository, ViewModel | Compose UI, DataStore ghi file thật, Room, navigation |
-| Lệnh Gradle | `testDebugUnitTest` | `connectedDebugAndroidTest` |
+| Lệnh Gradle | `testDevDebugUnitTest` | `connectedDevDebugAndroidTest` |
 
 Nguyên tắc: thứ gì unit test được thì unit test. Chỉ đẩy xuống androidTest những gì bắt buộc cần Android.
 
@@ -331,7 +331,7 @@ Lưu ý: trước khi mở lại cùng file, phải `scope.cancel()` rồi `scop
 Chạy:
 
 ```bash
-./gradlew :feature:settings:ui:connectedDebugAndroidTest :feature:settings:data:connectedDebugAndroidTest
+./gradlew :feature:settings:ui:connectedDevDebugAndroidTest :feature:settings:data:connectedDevDebugAndroidTest
 ```
 
 ---

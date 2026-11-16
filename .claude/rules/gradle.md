@@ -23,6 +23,7 @@ paths:
 - `namespace` mirrors the path: `com.example.upk.<feature>.<layer>`.
 - `compileSdk`, `minSdk`, Java target and `testInstrumentationRunner` are identical across modules; do not change them in one module only.
 - Cross-cutting build logic (e.g. protobuf setup) lives in `build-logic/src/main/kotlin/upk.<name>.gradle.kts` and is applied with `alias(libs.plugins.upk<Name>)`. Do not copy plugin configuration between modules.
-- After any build-file change run `./gradlew :<module>:testDebugUnitTest` (`:app:testDevDebugUnitTest` for the app module, or `:app:assembleDevDebug` when no tests exist) to prove it still configures.
-- Product flavors (`dev`, `staging`, `prod`) are declared only in `app/build.gradle.kts`. Library modules stay flavorless; never add `flavorDimensions` or `missingDimensionStrategy` to them.
+- After any build-file change run `./gradlew :<module>:testDevDebugUnitTest` (or `:app:assembleDevDebug` when no tests exist) to prove it still configures.
+- Every Android module applies `alias(libs.plugins.upkFlavors)` right after the Android plugin. It declares the `dev`, `staging` and `prod` flavors; never declare `flavorDimensions`, `productFlavors { create(...) }` or `missingDimensionStrategy` in a module build file.
+- A module that needs a per-environment value applies `alias(libs.plugins.secrets)` with `buildFeatures { buildConfig = true }` and reads its own `BuildConfig`. Never hand-write `buildConfigField` for such values.
 - Never touch `local.properties`, `*.properties` secrets or `.idea/` in a change.

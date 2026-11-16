@@ -20,7 +20,7 @@ Argument: a file path or class name.
    - `runBlocking` for simple suspend calls, `runTest` + `UnconfinedTestDispatcher` for scopes and ViewModels (`MainDispatcherRule`),
    - `first()` / `toList()` for flows; `object : X by fake { override ... }` to override one method,
    - group with `// ---------- Section ----------` comments.
-5. Run `./gradlew :<module>:testDebugUnitTest --tests "*<ClassName>Test"` and paste the pass/fail summary. Fix failing tests only if the failure is in the test; if it reveals a bug in production code, report it and ask before changing production code.
+5. Run `./gradlew :<module>:testDevDebugUnitTest --tests "*<ClassName>Test"` and paste the pass/fail summary. Fix failing tests only if the failure is in the test; if it reveals a bug in production code, report it and ask before changing production code.
 6. Finish with:
    ```bash
    git add <test files>
