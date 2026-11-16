@@ -16,8 +16,8 @@ plugins {
 val secretsFile = rootProject.file("secrets.properties")
 if (!secretsFile.isFile) {
     throw GradleException(
-        "secrets.properties not found. Copy secrets.properties.example to secrets.properties " +
-            "and fill in the values of the environment you want to build. See README.md."
+        "secrets.properties not found. Run scripts/use-env.sh dev (scripts\\use-env.bat dev on Windows) " +
+            "to create it from the secrets folder. See README.md."
     )
 }
 val secretProperties = Properties().apply {
