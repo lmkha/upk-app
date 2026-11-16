@@ -23,7 +23,7 @@ jobs:
     name: Unit tests, lint and debug build
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    # Pull requests are always verified against the develop environment (dev flavor).
+    # Pull requests are always verified against the develop environment.
     # Secrets are not passed to pull requests opened from forks, so this job
     # only works for branches pushed to this repository.
     environment: develop
@@ -41,9 +41,10 @@ jobs:
       - name: Setup Gradle with caching
         uses: gradle/actions/setup-gradle@v4
 
-      # local.properties is the file the secrets Gradle plugin and app/build.gradle.kts read.
-      # The whole properties file of the develop environment is written straight into it.
-      - name: Generate local.properties from environment secrets
+      # secrets.properties is the file the secrets Gradle plugin and app/build.gradle.kts read.
+      # The PROPERTIES secret holds the whole file of the develop environment. ENVIRONMENT is
+      # appended here so it always matches the GitHub Environment this job runs in.
+      - name: Generate secrets.properties from environment secrets
         env:
           PROPERTIES: ${{ secrets.PROPERTIES }}
         run: |
@@ -51,7 +52,8 @@ jobs:
             echo "PROPERTIES is not set for the develop environment." >&2
             exit 1
           fi
-          printf '%s\n' "${PROPERTIES}" >> local.properties
+          printf '%s\n' "${PROPERTIES}" > secrets.properties
+          echo "ENVIRONMENT=dev" >> secrets.properties
 
       - name: Generate google-services.json from environment secrets
         env:

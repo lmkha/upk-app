@@ -52,10 +52,17 @@ jobs:
         run: |
           case "${TARGET_ENVIRONMENT}" in
             develop)
+              app_environment=dev
               build_type=debug
               assemble_task=":app:assembleDebug"
               ;;
-            staging|production)
+            staging)
+              app_environment=staging
+              build_type=release
+              assemble_task=":app:assembleRelease"
+              ;;
+            production)
+              app_environment=prod
               build_type=release
               assemble_task=":app:assembleRelease"
               ;;
@@ -66,6 +73,7 @@ jobs:
           esac
           {
             echo "environment=${TARGET_ENVIRONMENT}"
+            echo "app_environment=${app_environment}"
             echo "build_type=${build_type}"
             echo "assemble_task=${assemble_task}"
           } >> "${GITHUB_OUTPUT}"
@@ -79,18 +87,20 @@ jobs:
       - name: Setup Gradle with caching
         uses: gradle/actions/setup-gradle@v4
 
-      # local.properties is the file the secrets Gradle plugin and app/build.gradle.kts read.
-      # Each job builds one environment, so the whole properties file of that environment
-      # is written straight into local.properties.
-      - name: Generate local.properties from environment secrets
+      # secrets.properties is the file the secrets Gradle plugin and app/build.gradle.kts read.
+      # The PROPERTIES secret holds the whole file of the selected environment. ENVIRONMENT is
+      # appended here so it always matches the GitHub Environment this job runs in.
+      - name: Generate secrets.properties from environment secrets
         env:
           PROPERTIES: ${{ secrets.PROPERTIES }}
+          APP_ENVIRONMENT: ${{ steps.variant.outputs.app_environment }}
         run: |
           if [ -z "${PROPERTIES}" ]; then
             echo "PROPERTIES is not set for this environment." >&2
             exit 1
           fi
-          printf '%s\n' "${PROPERTIES}" >> local.properties
+          printf '%s\n' "${PROPERTIES}" > secrets.properties
+          echo "ENVIRONMENT=${APP_ENVIRONMENT}" >> secrets.properties
 
       - name: Generate google-services.json from environment secrets
         env:
