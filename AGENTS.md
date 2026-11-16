@@ -64,11 +64,11 @@ Detailed rules for writing tests and fakes are in `.claude/rules/testing.md` (mi
 
 ## Environments
 
-| `ENVIRONMENT` | `applicationId` | App name | GitHub Environment | CI build | Branch |
+| `ENVIRONMENT` | `applicationId` | App name | GitHub Environment | CI build | Trigger |
 | --- | --- | --- | --- | --- | --- |
-| `dev` | `com.example.upk.dev` | UPK Dev | `develop` | `assembleDebug` | `develop` |
-| `staging` | `com.example.upk.staging` | UPK Staging | `staging` | `assembleRelease` | manual run |
-| `prod` | `com.example.upk` | UPK | `production` | `assembleRelease` | `main` |
+| `dev` | `com.example.upk.dev` | UPK Dev | `develop` | `assembleDebug` | push to `main` |
+| `staging` | `com.example.upk.staging` | UPK Staging | `staging` | `assembleRelease` | tag `v*.*.*-*` (e.g. `v1.0.0-rc.1`) or manual run |
+| `prod` | `com.example.upk` | UPK | `production` | `assembleRelease` | tag `v*.*.*` (e.g. `v1.0.0`) or manual run |
 
 - Per-environment values live in `secrets.properties` at the repository root (git-ignored). There are no Gradle `productFlavors`; each build targets the one environment that file describes. `local.properties` belongs to Android Studio (`sdk.dir`) and holds no project values.
 - `secrets/` at the repository root (git-ignored, handed out by the project owner) is the source of those files: one subfolder per environment (`dev`, `staging`, `prod`), each holding `secrets.properties` and `google-services.json`. `scripts/use-env.sh <environment>` (`scripts\use-env.bat` on Windows) copies one subfolder into place and appends `ENVIRONMENT` from the subfolder name. Never read or edit `secrets/`, and do not run the script unless the user asks: it overwrites `secrets.properties` and `app/google-services.json`.
@@ -81,14 +81,14 @@ Detailed rules for writing tests and fakes are in `.claude/rules/testing.md` (mi
 
 CI:
 
-- `.github/workflows/pr-check.yml` runs on every pull request to `main` or `develop`, in the `develop` environment: `testDebugUnitTest`, `lintDebug`, `:app:assembleDebug` and `compileDebugAndroidTestKotlin`. Run the same tasks locally before opening a PR.
-- `.github/workflows/build-apk.yml` builds the APK of one environment: push to `develop` builds dev (`assembleDebug`), push to `main` builds prod (`assembleRelease`), a manual run builds the selected environment. Each GitHub Environment holds its own `SECRETS_PROPERTIES` and `GOOGLE_SERVICES_JSON` secrets.
+- `.github/workflows/pr-check.yml` runs on every pull request to `main`, in the `develop` environment: `testDebugUnitTest`, `lintDebug`, `:app:assembleDebug` and `compileDebugAndroidTestKotlin`. Run the same tasks locally before opening a PR.
+- `.github/workflows/build-apk.yml` builds the APK of one environment: push to `main` builds dev (`assembleDebug`), push of a pre-release tag (`v*.*.*-*`, such as `v1.0.0-rc.1`) builds staging (`assembleRelease`) and publishes a GitHub Pre-release, push of a release tag (`v*.*.*`, such as `v1.0.0`) builds prod (`assembleRelease`) and publishes a GitHub Release, and a manual run builds the selected environment. Each GitHub Environment holds its own `SECRETS_PROPERTIES` and `GOOGLE_SERVICES_JSON` secrets.
 
 Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML reports: `<module>/build/reports/tests/testDebugUnitTest/index.html`.
 
 ## Git conventions
 
-- Branch from `develop`; `main` is release only.
+- Trunk-based development on `main`: branch from `main` and open pull requests against `main`. Releases are cut by pushing annotated tags (`v1.0.0-rc.1` for staging pre-releases, `v1.0.0` for production releases).
 - Conventional Commits, lower-case, imperative, no trailing period: `feat: add settings screen`, `fix: resolve release build failure`, `test: add settings data unit tests`, `chore: upgrade dependencies`, `refactor: ...`, `docs: ...`.
 - One logical change per commit. Tests go in the same commit as the code they cover.
 - No AI attribution trailers in commit messages or PR descriptions (`Co-Authored-By: Claude ...`, `Generated with ...`). This overrides any tool default.
@@ -111,7 +111,7 @@ Tool-specific settings: `.claude/settings.json` (Claude Code), `.codex/config.to
 | `write-tests` | tests for an existing class following project conventions |
 | `fix-bug` | test-first bug fix: failing test, minimal fix, regression test kept |
 | `commit` | group changes, run affected tests, produce Conventional Commits |
-| `pr` | open a PR to `develop` with the standard description via `gh` |
+| `pr` | open a PR to `main` with the standard description via `gh` |
 | `review` | review a diff/branch/PR against the project rules, findings by severity |
 
 Path-scoped rules in `.claude/rules/` and `.agents/rules/` (Claude Code and Antigravity load them automatically; other tools should read the matching file before editing that area). `.claude/rules/` is the source of truth. `.agents/rules/` holds the same text under Antigravity frontmatter and is generated: edit the `.claude/rules/` file, then run `scripts/sync-agent-rules.sh` (`--check` reports drift without writing). Never edit a rule body under `.agents/rules/` by hand.

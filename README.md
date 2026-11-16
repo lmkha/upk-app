@@ -91,16 +91,16 @@ Features: `auth`, `home`, `payment`, `settings`. Dependencies point one way: `ui
 
 | Workflow | Runs on | What it does |
 | --- | --- | --- |
-| `pr-check.yml` | pull request to `main` or `develop` | unit tests, lint, debug build, compiles instrumented tests |
-| `build-apk.yml` | push to `develop` or `main`, or manual run | builds and uploads the APK of one environment |
+| `pr-check.yml` | pull request to `main` | unit tests, lint, debug build, compiles instrumented tests |
+| `build-apk.yml` | push to `main`, tag `v*.*.*`, or manual run | builds and uploads the APK of one environment, and publishes a GitHub Release on tags |
 
-`build-apk.yml` builds `dev` (debug) on `develop` and `prod` (release) on `main`. A manual run builds the environment you pick, including `staging` (release).
+`build-apk.yml` builds `dev` (debug) on push to `main`, `staging` (release + GitHub Pre-release) on pre-release tags such as `v1.0.0-rc.1`, and `prod` (release + GitHub Release) on release tags such as `v1.0.0`. A manual run builds the environment you pick.
 
 Each GitHub Environment (`develop`, `staging`, `production`) holds two secrets: `SECRETS_PROPERTIES`, the full content of `secrets.properties` for that environment, and `GOOGLE_SERVICES_JSON`.
 
 ## Contributing
 
-- Branch from `develop` and open pull requests against `develop`. `main` is for releases and only accepts pull requests that pass the checks.
+- Branch from `main` and open pull requests against `main`. Releases are cut by pushing `v*.*.*` tags (`v1.0.0-rc.1` for staging pre-releases, `v1.0.0` for production releases).
 - Commit messages follow Conventional Commits: `feat: add settings screen`, `fix(auth): refresh expired token`.
 - Run the pull request checks locally before pushing:
 

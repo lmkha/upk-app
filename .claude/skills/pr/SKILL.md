@@ -1,14 +1,14 @@
 ---
 name: pr
-description: Open a pull request from the current branch to develop with a standard description (summary, changes, test plan, screenshots) using gh. Use for "/pr", "open a PR", "create pull request".
+description: Open a pull request from the current branch to main with a standard description (summary, changes, test plan, screenshots) using gh. Use for "/pr", "open a PR", "create pull request".
 ---
 
 # Open a pull request
 
 ## Steps
 
-1. Preconditions: `git status` is clean, branch is not `develop`/`main`, `git log develop..HEAD` is non-empty. Push the branch (`git push -u origin <branch>`) only after confirming with the user if it has not been pushed yet.
-2. Build the description from `git log develop..HEAD --oneline` and `git diff develop...HEAD --stat`:
+1. Preconditions: `git status` is clean, branch is not `main`, `git log main..HEAD` is non-empty. Push the branch (`git push -u origin <branch>`) only after confirming with the user if it has not been pushed yet.
+2. Build the description from `git log main..HEAD --oneline` and `git diff main...HEAD --stat`:
 
    ```markdown
    ## Summary
@@ -27,5 +27,5 @@ description: Open a pull request from the current branch to develop with a stand
    ```
    No AI attribution footer (`Generated with ...`), even if the tool suggests one.
 3. Title: same format as a commit summary (`feat(settings): add language picker`), max 72 chars.
-4. Run `gh pr create --base develop --title "<title>" --body "<body>"` (use a heredoc for the body). Mark as draft (`--draft`) if tests in the plan are unchecked.
+4. Run `gh pr create --base main --title "<title>" --body "<body>"` (use a heredoc for the body). Mark as draft (`--draft`) if tests in the plan are unchecked.
 5. Reply with the PR URL and anything the reviewer must know (migrations, new dependencies, follow-ups).
