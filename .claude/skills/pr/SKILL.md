@@ -18,7 +18,7 @@ description: Open a pull request from the current branch to develop with a stand
    - <bullet per logical change, grouped by module>
 
    ## Test plan
-   - [ ] `./gradlew testDebugUnitTest` passes
+   - [ ] `./gradlew testDebugUnitTest :app:testDevDebugUnitTest` passes
    - [ ] `./gradlew :<module>:connectedDebugAndroidTest` on an emulator (if Compose/DataStore changed)
    - [ ] Manual: <steps to verify in the app>
 

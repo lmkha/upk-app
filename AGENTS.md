@@ -54,15 +54,36 @@ Detailed rules for writing tests and fakes are in `.claude/rules/testing.md` (mi
 ## Commands
 
 ```bash
-./gradlew :feature:settings:domain:testDebugUnitTest        # unit tests, one module
-./gradlew testDebugUnitTest                                  # unit tests, whole project
+./gradlew :feature:settings:domain:testDebugUnitTest        # unit tests, one library module
+./gradlew :app:testDevDebugUnitTest                          # unit tests, app module
+./gradlew testDebugUnitTest :app:testDevDebugUnitTest        # unit tests, whole project
 ./gradlew :feature:settings:ui:connectedDebugAndroidTest     # instrumented tests (needs emulator)
-./gradlew :app:assembleDebug                                 # build debug APK
-./gradlew lintDebug                                          # Android lint, whole project
-./gradlew assembleDebugAndroidTest                           # compile instrumented tests without an emulator
+./gradlew :app:assembleDevDebug                              # build the dev debug APK
+./gradlew lintDebug :app:lintDevDebug                        # Android lint, whole project
+./gradlew assembleDebugAndroidTest :app:assembleDevDebugAndroidTest   # compile instrumented tests without an emulator
 ```
 
-CI: `.github/workflows/pr-check.yml` runs `testDebugUnitTest`, `lintDebug`, `:app:assembleDebug` and `assembleDebugAndroidTest` on every pull request to `main` or `develop`. Run the same tasks locally before opening a PR.
+Only `app` has product flavors, so its tasks carry the flavor name (`testDevDebugUnitTest`, `assembleProdRelease`). Library modules keep the plain names. A bare `./gradlew testDebugUnitTest` or `lintDebug` silently skips `app`; always add the `:app:` task as shown above.
+
+## Environments
+
+| Flavor | applicationId | GitHub Environment | CI build | Branch |
+| --- | --- | --- | --- | --- |
+| `dev` | `com.example.upk.dev` | `develop` | `assembleDevDebug` | `develop` |
+| `staging` | `com.example.upk.staging` | `staging` | `assembleStagingRelease` | manual run |
+| `prod` | `com.example.upk` | `production` | `assembleProdRelease` | `main` |
+
+- The flavor dimension `environment` exists only in `app/build.gradle.kts`. Do not add flavors to library modules.
+- Per-environment values come from properties files at the repository root, all git-ignored. The secrets Gradle plugin (applied in `app`) turns every key of `local.properties` into an `app` `BuildConfig` field, then overrides it with the keys of `<flavor>.properties` (`dev.properties`, `staging.properties`, `prod.properties`). A flavor without its own file uses the `local.properties` values.
+- To add a per-environment value, add the key to those properties files (and to the GitHub Environment secrets plus the "Generate local.properties" step of both workflows). Never add `buildConfigField` lines per flavor in `app/build.gradle.kts`.
+- Library modules do not read `BuildConfig` for environment values. `app` exposes them through Hilt: `AppModule` provides `@ApiBaseUrl` from `BuildConfig.API_URL`; follow the same pattern (qualifier in the consuming module, `@Provides` in `AppModule`) when a library needs a new value.
+- `google-services.json` must contain a client for the applicationId being built. Place one file with all three clients at `app/google-services.json`, or one file per flavor at `app/src/<flavor>/google-services.json`. Both locations are git-ignored.
+- Use `dev` for local work and verification unless the task is about another environment.
+
+CI:
+
+- `.github/workflows/pr-check.yml` runs on every pull request to `main` or `develop`, in the `develop` environment: unit tests, lint, `:app:assembleDevDebug` and androidTest compilation. Run the same tasks locally before opening a PR.
+- `.github/workflows/build-apk.yml` builds the APK of one environment: push to `develop` builds dev, push to `main` builds prod, a manual run builds the selected environment. Each GitHub Environment holds its own `API_URL` and `GOOGLE_SERVICES_JSON` secrets.
 
 Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML reports: `<module>/build/reports/tests/testDebugUnitTest/index.html`.
 

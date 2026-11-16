@@ -83,7 +83,7 @@ Ranh giới giữa các vai mờ dần ở team nhỏ, developer thường kiêm
 ## 7. Thứ tự đầu tư cho project UPK
 
 1. Unit và integration test: đã có cho feature `settings`, mở rộng sang `auth`, `payment`, `home`.
-2. CI (GitHub Actions) chạy `./gradlew testDebugUnitTest` mỗi lần push hoặc mở PR, chặn merge khi fail.
+2. CI (GitHub Actions) chạy `./gradlew testDebugUnitTest :app:testDevDebugUnitTest` mỗi lần mở PR, chặn merge khi fail.
 3. Screenshot test cho Compose bằng Roborazzi hoặc Paparazzi.
 4. E2E cho vài luồng chính (mở app, đổi theme, thanh toán) khi app đã ổn định.
 

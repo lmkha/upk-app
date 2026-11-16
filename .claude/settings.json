@@ -1,9 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./gradlew *testDebugUnitTest*)",
-      "Bash(./gradlew *assembleDebug*)",
-      "Bash(./gradlew *assembleDebugAndroidTest*)",
+      "Bash(./gradlew *DebugUnitTest*)",
+      "Bash(./gradlew *assemble*Debug*)",
+      "Bash(./gradlew *lint*Debug*)",
       "Bash(./gradlew *dependencies*)",
       "Bash(git status*)",
       "Bash(git diff*)",
@@ -18,6 +18,9 @@
       "Read(./local.properties)",
       "Read(**/debug.properties)",
       "Read(**/release.properties)",
+      "Read(**/dev.properties)",
+      "Read(**/staging.properties)",
+      "Read(**/prod.properties)",
       "Read(**/google-services.json)",
       "Read(**/*.jks)",
       "Read(**/*.keystore)",

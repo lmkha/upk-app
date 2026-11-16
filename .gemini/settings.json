@@ -13,8 +13,8 @@
   "tools": {
     "allowed": [
       "run_shell_command(./gradlew testDebugUnitTest)",
-      "run_shell_command(./gradlew :app:assembleDebug)",
-      "run_shell_command(./gradlew :app:testDebugUnitTest)",
+      "run_shell_command(./gradlew :app:assembleDevDebug)",
+      "run_shell_command(./gradlew :app:testDevDebugUnitTest)",
       "run_shell_command(./gradlew :core:)",
       "run_shell_command(./gradlew :feature:)",
       "run_shell_command(git status)",

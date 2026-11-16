@@ -31,7 +31,7 @@ Argument: `<feature>` in lower-case (e.g. `profile`). `<Feature>` below is the P
 5. Add to `app/build.gradle.kts`: `implementation(project(":feature:<feature>:ui"))`, `:domain` and `:data` (data is needed so Hilt sees the bindings).
 6. Add a `Destination.<Feature>` object in `app/.../ui/navigation/Destination.kt` and a `composable<Destination.<Feature>>` entry in `app/.../ui/app/App.kt`. Do not add a navigation trigger from another screen unless asked.
 7. Create test scaffolding: `Fake<Feature>Repository` under `domain/src/test` and a copy under `ui/src/test` (test source sets are not shared between modules), a `<Feature>ViewModelTest` with at least the initial-state test, and `MainDispatcherRule` copied from `feature/settings/ui/src/test`.
-8. Run `./gradlew :feature:<feature>:ui:testDebugUnitTest :app:assembleDebug`.
+8. Run `./gradlew :feature:<feature>:ui:testDebugUnitTest :app:assembleDevDebug`.
 9. Finish with the file list and:
    ```bash
    git add settings.gradle.kts app/build.gradle.kts app/src/main/java/com/example/upk/ui feature/<feature>

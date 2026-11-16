@@ -240,8 +240,8 @@ Những gì nên test ở ViewModel:
 # Chỉ một class
 ./gradlew :feature:settings:domain:testDebugUnitTest --tests "*ThemeModeTest"
 
-# Toàn bộ project
-./gradlew testDebugUnitTest
+# Toàn bộ project (module app có flavor nên tên task khác các module còn lại)
+./gradlew testDebugUnitTest :app:testDevDebugUnitTest
 ```
 
 Hành vi mặc định của Gradle cần biết:
