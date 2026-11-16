@@ -56,17 +56,16 @@ jobs:
           echo "API_URL=\"${API_URL}\"" >> local.properties
           echo "${GOOGLE_SERVICES_JSON}" > app/google-services.json
 
-      # Library modules have no flavors (testDebugUnitTest, lintDebug);
-      # the app module is checked with its dev flavor (testDevDebugUnitTest, lintDevDebug).
+      # Every module has the dev / staging / prod flavors, so one task name covers the whole project.
       - name: Run unit tests
-        run: ./gradlew testDebugUnitTest :app:testDevDebugUnitTest
+        run: ./gradlew testDevDebugUnitTest
 
       - name: Run Android lint
-        run: ./gradlew lintDebug :app:lintDevDebug
+        run: ./gradlew lintDevDebug
 
       # Instrumented tests need an emulator, so they are only compiled here.
       - name: Build debug APK and compile instrumented tests
-        run: ./gradlew :app:assembleDevDebug assembleDebugAndroidTest :app:assembleDevDebugAndroidTest
+        run: ./gradlew :app:assembleDevDebug assembleDevDebugAndroidTest
 
       - name: Upload test and lint reports
         if: ${{ failure() }}

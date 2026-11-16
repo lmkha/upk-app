@@ -54,17 +54,17 @@ jobs:
             develop)
               flavor=dev; build_type=debug
               assemble_task=":app:assembleDevDebug"
-              test_task=":app:testDevDebugUnitTest"
+              test_task="testDevDebugUnitTest"
               ;;
             staging)
               flavor=staging; build_type=release
               assemble_task=":app:assembleStagingRelease"
-              test_task=":app:testStagingDebugUnitTest"
+              test_task="testStagingDebugUnitTest"
               ;;
             production)
               flavor=prod; build_type=release
               assemble_task=":app:assembleProdRelease"
-              test_task=":app:testProdDebugUnitTest"
+              test_task="testProdDebugUnitTest"
               ;;
             *)
               echo "Unknown environment: ${TARGET_ENVIRONMENT}" >&2
@@ -102,11 +102,10 @@ jobs:
           echo "API_URL=\"${API_URL}\"" >> local.properties
           echo "${GOOGLE_SERVICES_JSON}" > app/google-services.json
 
-      # Library modules have no flavors, so their task is testDebugUnitTest;
-      # the app module runs the tests of the flavor being built.
+      # Runs the unit tests of every module in the flavor being built.
       - name: Run unit tests
         if: ${{ github.event_name == 'push' || inputs.run_tests }}
-        run: ./gradlew testDebugUnitTest ${{ steps.variant.outputs.test_task }}
+        run: ./gradlew ${{ steps.variant.outputs.test_task }}
 
       - name: Build APK
         run: ./gradlew ${{ steps.variant.outputs.assemble_task }}
