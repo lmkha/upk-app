@@ -24,9 +24,14 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+    // BuildConfig fields come from the secrets plugin: every key of secrets.properties.
     buildFeatures {
         buildConfig = true
     }
+}
+
+secrets {
+    propertiesFileName = "secrets.properties"
 }
 
 dependencies {

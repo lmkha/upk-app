@@ -19,9 +19,14 @@ permissions:
 
 jobs:
   verify:
+    # Branch protection requires a status check with this exact name; do not rename the job.
     name: Unit tests, lint and debug build
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Pull requests are always verified against the develop environment.
+    # Secrets are not passed to pull requests opened from forks, so this job
+    # only works for branches pushed to this repository.
+    environment: develop
 
     steps:
       - name: Checkout repository
@@ -36,15 +41,29 @@ jobs:
       - name: Setup Gradle with caching
         uses: gradle/actions/setup-gradle@v4
 
-      # Secrets are not passed to pull requests opened from forks, so this job
-      # only works for branches pushed to this repository.
-      - name: Generate local.properties and google-services.json from GitHub Secrets
+      # secrets.properties is the file the secrets Gradle plugin and app/build.gradle.kts read.
+      # The SECRETS_PROPERTIES secret holds the whole file of the develop environment. ENVIRONMENT is
+      # appended here so it always matches the GitHub Environment this job runs in.
+      - name: Generate secrets.properties from environment secrets
         env:
-          API_URL: ${{ secrets.API_URL }}
+          SECRETS_PROPERTIES: ${{ secrets.SECRETS_PROPERTIES }}
+        run: |
+          if [ -z "${SECRETS_PROPERTIES}" ]; then
+            echo "SECRETS_PROPERTIES is not set for the develop environment." >&2
+            exit 1
+          fi
+          printf '%s\n' "${SECRETS_PROPERTIES}" > secrets.properties
+          echo "ENVIRONMENT=dev" >> secrets.properties
+
+      - name: Generate google-services.json from environment secrets
+        env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
-          echo "API_URL=\"${API_URL}\"" >> local.properties
-          echo "${GOOGLE_SERVICES_JSON}" > app/google-services.json
+          if [ -z "${GOOGLE_SERVICES_JSON}" ]; then
+            echo "GOOGLE_SERVICES_JSON is not set for the develop environment." >&2
+            exit 1
+          fi
+          printf '%s\n' "${GOOGLE_SERVICES_JSON}" > app/google-services.json
 
       - name: Run unit tests
         run: ./gradlew testDebugUnitTest
@@ -62,7 +81,7 @@ jobs:
         with:
           name: pr-check-reports
           path: |
-            **/build/reports/tests/testDebugUnitTest/
-            **/build/reports/lint-results-debug.html
+            **/build/reports/tests/
+            **/build/reports/lint-results-*.html
           if-no-files-found: ignore
           retention-days: 7

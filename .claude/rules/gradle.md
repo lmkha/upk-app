@@ -24,4 +24,10 @@ paths:
 - `compileSdk`, `minSdk`, Java target and `testInstrumentationRunner` are identical across modules; do not change them in one module only.
 - Cross-cutting build logic (e.g. protobuf setup) lives in `build-logic/src/main/kotlin/upk.<name>.gradle.kts` and is applied with `alias(libs.plugins.upk<Name>)`. Do not copy plugin configuration between modules.
 - After any build-file change run `./gradlew :<module>:testDebugUnitTest` (or `:app:assembleDebug` when no tests exist) to prove it still configures.
-- Never touch `local.properties`, `*.properties` secrets or `.idea/` in a change.
+- A module that needs a per-environment value reads its own `BuildConfig`. That takes three things in its `build.gradle.kts`, all required:
+  - `alias(libs.plugins.secrets)` in `plugins`,
+  - `buildFeatures { buildConfig = true }` inside `android`,
+  - a top-level `secrets { propertiesFileName = "secrets.properties" }` block.
+- Never omit the `secrets { }` block. Without it the plugin silently reads `local.properties`, which holds no project keys, so the `BuildConfig` fields are not generated and the module fails with "Unresolved reference". `core/data/build.gradle.kts` is the reference.
+- Never hand-write `buildConfigField` for per-environment values.
+- Never touch `local.properties`, `secrets.properties` or `.idea/` in a change. `secrets.properties.example` is the only properties file with project keys that is committed.

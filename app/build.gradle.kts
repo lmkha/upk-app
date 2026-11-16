@@ -1,3 +1,4 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -10,6 +11,31 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
 }
 
+// Values that differ per environment live in secrets.properties (git-ignored).
+// local.properties is left to Android Studio (sdk.dir).
+val secretsFile = rootProject.file("secrets.properties")
+if (!secretsFile.isFile) {
+    throw GradleException(
+        "secrets.properties not found. Copy secrets.properties.example to secrets.properties " +
+            "and fill in the values of the environment you want to build. See README.md."
+    )
+}
+val secretProperties = Properties().apply {
+    secretsFile.inputStream().use(::load)
+}
+
+// ENVIRONMENT decides the identity of the installed app. It is mandatory, so a build can
+// never fall back to the production applicationId by accident.
+val environment = secretProperties.getProperty("ENVIRONMENT")?.trim()?.removeSurrounding("\"")
+val (environmentIdSuffix, environmentVersionSuffix, environmentAppName) = when (environment) {
+    "dev" -> Triple(".dev", "-dev", "UPK Dev")
+    "staging" -> Triple(".staging", "-staging", "UPK Staging")
+    "prod" -> Triple(null, null, "UPK")
+    else -> throw GradleException(
+        "ENVIRONMENT in secrets.properties must be dev, staging or prod, but was '$environment'."
+    )
+}
+
 android {
     namespace = "com.example.upk"
     compileSdk {
@@ -18,10 +44,13 @@ android {
 
     defaultConfig {
         applicationId = "com.example.upk"
+        applicationIdSuffix = environmentIdSuffix
         minSdk = 29
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
+        versionNameSuffix = environmentVersionSuffix
+        resValue("string", "app_name", environmentAppName)
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -43,6 +72,7 @@ android {
     }
     buildFeatures {
         compose = true
+        resValues = true
     }
 }
 

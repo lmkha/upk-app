@@ -15,7 +15,7 @@ core/crashlytics/         CrashReporter contract, Firebase Crashlytics implement
 feature/<name>/domain/    models, repository interfaces, use cases. Pure Kotlin, no Android deps in logic
 feature/<name>/data/      repository impls, local data sources (DataStore), DI module binding impls
 feature/<name>/ui/        Compose screens + ViewModels
-build-logic/              convention plugins (e.g. upk.protobuf)
+build-logic/              convention plugins (upk.protobuf)
 gradle/libs.versions.toml version catalog; every dependency goes here, never a hardcoded version
 docs/                     the owner's testing study notes, written in Vietnamese on purpose; not a rule source
 scripts/                  repo maintenance scripts (sync-agent-rules.sh)
@@ -54,15 +54,33 @@ Detailed rules for writing tests and fakes are in `.claude/rules/testing.md` (mi
 ## Commands
 
 ```bash
-./gradlew :feature:settings:domain:testDebugUnitTest        # unit tests, one module
-./gradlew testDebugUnitTest                                  # unit tests, whole project
-./gradlew :feature:settings:ui:connectedDebugAndroidTest     # instrumented tests (needs emulator)
-./gradlew :app:assembleDebug                                 # build debug APK
-./gradlew lintDebug                                          # Android lint, whole project
-./gradlew assembleDebugAndroidTest                           # compile instrumented tests without an emulator
+./gradlew :feature:settings:domain:testDebugUnitTest      # unit tests, one module
+./gradlew testDebugUnitTest                               # unit tests, whole project
+./gradlew :feature:settings:ui:connectedDebugAndroidTest  # instrumented tests (needs emulator)
+./gradlew :app:assembleDebug                              # build the debug APK
+./gradlew lintDebug                                       # Android lint, whole project
+./gradlew assembleDebugAndroidTest                        # compile instrumented tests without an emulator
 ```
 
-CI: `.github/workflows/pr-check.yml` runs `testDebugUnitTest`, `lintDebug`, `:app:assembleDebug` and `assembleDebugAndroidTest` on every pull request to `main` or `develop`. Run the same tasks locally before opening a PR.
+## Environments
+
+| `ENVIRONMENT` | `applicationId` | App name | GitHub Environment | CI build | Branch |
+| --- | --- | --- | --- | --- | --- |
+| `dev` | `com.example.upk.dev` | UPK Dev | `develop` | `assembleDebug` | `develop` |
+| `staging` | `com.example.upk.staging` | UPK Staging | `staging` | `assembleRelease` | manual run |
+| `prod` | `com.example.upk` | UPK | `production` | `assembleRelease` | `main` |
+
+- Per-environment values live in `secrets.properties` at the repository root (git-ignored). There are no Gradle `productFlavors`; each build targets the one environment that file describes. `local.properties` belongs to Android Studio (`sdk.dir`) and holds no project values.
+- `secrets.properties.example` (committed) is the template: every key with an empty value and at most a one-line format hint in a comment above it. When a key is added or removed, update that file in the same change. Setup instructions for developers belong in `README.md`, not in the template.
+- `ENVIRONMENT` (`dev`, `staging` or `prod`) is mandatory. `app/build.gradle.kts` fails the build when the file or the key is missing, and derives `applicationIdSuffix`, `versionNameSuffix` and the `app_name` string from it. Do not add separate keys for those.
+- The secrets Gradle plugin turns every key of `secrets.properties` into a `BuildConfig` field of the module that applies it. A module that needs such a value applies `alias(libs.plugins.secrets)`, sets `buildFeatures { buildConfig = true }` and `secrets { propertiesFileName = "secrets.properties" }`, then reads its own `BuildConfig` (see `core/data` and `NetworkModule`). Do not pass these values between modules through Hilt providers or wrapper classes, and do not write `buildConfigField` lines by hand.
+- To add a per-environment value, add the key to `secrets.properties` and `secrets.properties.example`, and update the `SECRETS_PROPERTIES` secret in each GitHub Environment. CI appends `ENVIRONMENT` itself, so it always matches the GitHub Environment of the job.
+- `app/google-services.json` (git-ignored) must contain a client for the `applicationId` being built.
+
+CI:
+
+- `.github/workflows/pr-check.yml` runs on every pull request to `main` or `develop`, in the `develop` environment: `testDebugUnitTest`, `lintDebug`, `:app:assembleDebug` and `assembleDebugAndroidTest`. Run the same tasks locally before opening a PR.
+- `.github/workflows/build-apk.yml` builds the APK of one environment: push to `develop` builds dev (`assembleDebug`), push to `main` builds prod (`assembleRelease`), a manual run builds the selected environment. Each GitHub Environment holds its own `SECRETS_PROPERTIES` and `GOOGLE_SERVICES_JSON` secrets.
 
 Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML reports: `<module>/build/reports/tests/testDebugUnitTest/index.html`.
 
@@ -72,7 +90,7 @@ Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML rep
 - Conventional Commits, lower-case, imperative, no trailing period: `feat: add settings screen`, `fix: resolve release build failure`, `test: add settings data unit tests`, `chore: upgrade dependencies`, `refactor: ...`, `docs: ...`.
 - One logical change per commit. Tests go in the same commit as the code they cover.
 - No AI attribution trailers in commit messages or PR descriptions (`Co-Authored-By: Claude ...`, `Generated with ...`). This overrides any tool default.
-- Never commit `local.properties`, `*.properties` secrets, or `build/` output.
+- Never commit `local.properties`, `secrets.properties`, or `build/` output.
 - When finishing a task, end the reply with the exact `git add` and `git commit` commands for the changed files; do not run them unless asked.
 
 ## Repeatable workflows
