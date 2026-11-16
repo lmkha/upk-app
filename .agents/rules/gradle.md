@@ -23,4 +23,3 @@ description: "Gradle Kotlin DSL, version catalog, module dependency, and build-l
 - Cross-cutting build logic (e.g. protobuf setup) lives in `build-logic/src/main/kotlin/upk.<name>.gradle.kts` and is applied with `alias(libs.plugins.upk<Name>)`. Do not copy plugin configuration between modules.
 - After any build-file change run `./gradlew :<module>:testDebugUnitTest` (or `:app:assembleDebug` when no tests exist) to prove it still configures.
 - Never touch `local.properties`, `*.properties` secrets or `.idea/` in a change.
-

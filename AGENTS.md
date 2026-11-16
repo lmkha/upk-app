@@ -10,12 +10,15 @@ core/common/              shared models, network error types, DI qualifiers (@Ap
 core/data/                network stack: Retrofit/OkHttp, interceptors, TokenProvider, AppLanguageProvider
 core/domain/              shared domain contracts
 core/ui/                  shared Compose components
+core/analytics/           AnalyticsTracker contract and events, Firebase implementation, Hilt binding
+core/crashlytics/         CrashReporter contract, Firebase Crashlytics implementation, Hilt binding
 feature/<name>/domain/    models, repository interfaces, use cases. Pure Kotlin, no Android deps in logic
 feature/<name>/data/      repository impls, local data sources (DataStore), DI module binding impls
 feature/<name>/ui/        Compose screens + ViewModels
 build-logic/              convention plugins (e.g. upk.protobuf)
 gradle/libs.versions.toml version catalog; every dependency goes here, never a hardcoded version
-docs/                     project notes (docs/testing-guide.md)
+docs/                     the owner's testing study notes, written in Vietnamese on purpose; not a rule source
+scripts/                  repo maintenance scripts (sync-agent-rules.sh)
 ```
 
 Current features: `auth`, `home`, `payment`, `settings`. Package root is `com.example.upk`, module packages follow the path (e.g. `com.example.upk.settings.data`).
@@ -31,7 +34,7 @@ Current features: `auth`, `home`, `payment`, `settings`. Package root is `com.ex
 
 ## Code conventions
 
-- Everything in code is English: identifiers, comments, KDoc, test names, log and error strings.
+- Everything in code is English: identifiers, comments, KDoc, test names, log and error strings. Agent instructions (this file, rules, skills) are English too. The only exception is `docs/testing-*.md`, which stays in Vietnamese; do not translate it.
 - Kotlin official style. Trailing commas in multi-line parameter lists.
 - No wildcard imports.
 - Do not add a dependency without adding it to `gradle/libs.versions.toml` first.
@@ -41,12 +44,12 @@ Current features: `auth`, `home`, `payment`, `settings`. Package root is `com.ex
 Detailed rules for writing tests and fakes are in `.claude/rules/testing.md` (mirrored in `.agents/rules/testing.md`). Claude Code and Antigravity load it automatically when touching test sources; other tools should read it before writing tests.
 
 - Every new use case, repository, data source, serializer or ViewModel ships with unit tests in the same module under `src/test`.
-- Prefer hand-written fakes over mocking libraries. Fakes live next to the tests that use them (`FakeSettingsRepository`, `FakeDataStore`).
+- Prefer hand-written fakes over mocking libraries. Fakes live next to the tests that use them (`FakeSettingsRepository`, `FakeDataStore`); test source sets are not shared, so each module keeps its own copy.
 - Test names are backtick sentences describing behaviour: `` `selecting the current theme does not call repository` ``.
-- Coroutines: `runTest` + `UnconfinedTestDispatcher`; ViewModel tests use `MainDispatcherRule`.
+- Coroutines: `runBlocking` for a plain suspend call; `runTest` + `UnconfinedTestDispatcher` when the code under test launches coroutines; ViewModel tests use `MainDispatcherRule`.
 - Compose screens get an instrumented test under `src/androidTest` using `androidx.compose.ui.test.junit4.v2.createComposeRule`.
 - Do not write tests for interfaces, plain data classes or Hilt modules.
-- Run the affected module's tests before reporting work as done. Details in `docs/testing-guide.md`.
+- Run the affected module's tests before reporting work as done (see Commands below).
 
 ## Commands
 
@@ -70,7 +73,7 @@ Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML rep
 
 ## Repeatable workflows
 
-Step-by-step recipes live in `.claude/skills/<name>/SKILL.md` (open Agent Skills format). `.codex/skills/`, `.gemini/skills/` and `.agents/skills/` contain symlinks to the same folders so Codex, Gemini CLI and Antigravity find them too. Tools with slash-skill support run them via `/<name>`; other tools should open the file and follow the steps when the task matches its description.
+Step-by-step recipes live in `.claude/skills/<name>/SKILL.md` (open Agent Skills format). `.agents/skills/` contains one symlink per skill pointing at those folders; Codex, Gemini CLI and Antigravity all discover skills there, so no other per-tool skill directory is needed. When adding a skill, create the folder under `.claude/skills/`, add the symlink (`ln -s ../../.claude/skills/<name> .agents/skills/<name>`) and a row in the table below. Tools with slash-skill support run them via `/<name>`; other tools should open the file and follow the steps when the task matches its description.
 
 Tool-specific settings: `.claude/settings.json` (Claude Code), `.codex/config.toml` (Codex), `.gemini/settings.json` (Gemini CLI). Agent instructions never go in those files.
 
@@ -87,7 +90,7 @@ Tool-specific settings: `.claude/settings.json` (Claude Code), `.codex/config.to
 | `pr` | open a PR to `develop` with the standard description via `gh` |
 | `review` | review a diff/branch/PR against the project rules, findings by severity |
 
-Path-scoped rules in `.claude/rules/` and `.agents/rules/` (Claude Code and Antigravity load them automatically; other tools should read the matching file before editing that area):
+Path-scoped rules in `.claude/rules/` and `.agents/rules/` (Claude Code and Antigravity load them automatically; other tools should read the matching file before editing that area). `.claude/rules/` is the source of truth. `.agents/rules/` holds the same text under Antigravity frontmatter and is generated: edit the `.claude/rules/` file, then run `scripts/sync-agent-rules.sh` (`--check` reports drift without writing). Never edit a rule body under `.agents/rules/` by hand.
 
 | Rule file | Applies to |
 | --- | --- |

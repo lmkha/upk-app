@@ -36,8 +36,8 @@ Reference implementation: `feature/settings/ui/.../SettingsViewModel.kt`.
 
 ## Navigation (app module)
 
-- Destinations are `@Serializable` objects/classes in `app/.../ui/Destination.kt`; nested graphs are nested objects (`Destination.MainGraph.Home`).
-- Wire screens in `App.kt` with `composable<Destination.X> { XScreen(onNavigateToY = { navController.navigate(Destination.Y) }) }`.
+- Destinations are `@Serializable` objects/classes in `app/.../ui/navigation/Destination.kt`; nested graphs are nested objects (`Destination.MainGraph.Home`).
+- Wire screens in `app/.../ui/app/App.kt` with `composable<Destination.X> { XScreen(onNavigateToY = { navController.navigate(Destination.Y) }) }`.
 
 ## Tests
 

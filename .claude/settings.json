@@ -16,11 +16,15 @@
     ],
     "deny": [
       "Read(./local.properties)",
-      "Read(./debug.properties)",
-      "Read(./release.properties)",
-      "Read(./app/google-services.json)",
+      "Read(**/debug.properties)",
+      "Read(**/release.properties)",
+      "Read(**/google-services.json)",
+      "Read(**/*.jks)",
+      "Read(**/*.keystore)",
       "Bash(git push --force*)",
       "Bash(git push -f*)",
+      "Bash(git push * --force*)",
+      "Bash(git push * -f*)",
       "Bash(git reset --hard*)",
       "Bash(git clean*)"
     ]

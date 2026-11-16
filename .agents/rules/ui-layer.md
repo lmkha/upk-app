@@ -36,11 +36,10 @@ Reference implementation: `feature/settings/ui/.../SettingsViewModel.kt`.
 
 ## Navigation (app module)
 
-- Destinations are `@Serializable` objects/classes in `app/.../ui/Destination.kt`; nested graphs are nested objects (`Destination.MainGraph.Home`).
-- Wire screens in `App.kt` with `composable<Destination.X> { XScreen(onNavigateToY = { navController.navigate(Destination.Y) }) }`.
+- Destinations are `@Serializable` objects/classes in `app/.../ui/navigation/Destination.kt`; nested graphs are nested objects (`Destination.MainGraph.Home`).
+- Wire screens in `app/.../ui/app/App.kt` with `composable<Destination.X> { XScreen(onNavigateToY = { navController.navigate(Destination.Y) }) }`.
 
 ## Tests
 
 - ViewModel: unit test under `src/test` with `MainDispatcherRule` and the feature's `Fake<Feature>Repository` plus real use cases.
 - Screen: Compose test under `src/androidTest` with `androidx.compose.ui.test.junit4.v2.createComposeRule`, rendering the screen with a hand-built ViewModel.
-

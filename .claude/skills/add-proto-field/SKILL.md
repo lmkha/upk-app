@@ -9,7 +9,7 @@ Arguments: `<feature> <field_name> <type>` (e.g. `settings notifications_enabled
 
 ## Steps
 
-1. Open `feature/<feature>/data/src/main/proto/<feature>_preferences.proto`. Pick the next unused field number; never reuse a `reserved` number.
+1. List `feature/<feature>/data/src/main/proto/` and open the preferences proto there (settings uses `app_settings_preferences.proto`, auth uses `auth_preferences.proto`). If there are several or none, stop and ask. Pick the next unused field number; never reuse a `reserved` number.
 2. Add the field in snake_case. For an enum, declare it inside the message with `<NAME>_UNSPECIFIED = 0` first and a `Proto` suffix on the enum name.
 3. Local data source (`local/datasource/<Feature>LocalDataSource` + Impl): add `observe<Field>(): Flow<T>` and `suspend fun set<Field>(value: T)` using `updateData { it.copy { <field> = value } }`.
 4. Domain: add the model/enum under `domain/models` if the proto type is an enum, and the two methods to `<Feature>Repository`.

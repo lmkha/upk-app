@@ -7,7 +7,7 @@ paths:
 
 Applies to `core/domain` and every `feature/<name>/domain` module.
 
-- Pure Kotlin only. No `android.*`, `androidx.*` (except `javax.inject`), no Compose, no Retrofit, no DataStore, no proto types.
+- Pure Kotlin only. No `android.*` or `androidx.*`, no Compose, no Retrofit, no DataStore, no proto types. `javax.inject` and `kotlinx.coroutines` are the only framework imports allowed.
 - Package layout inside a feature domain module:
   - `models/`      plain data classes, enums, sealed classes used by ui and data
   - `repository/`  interfaces only

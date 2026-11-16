@@ -15,8 +15,13 @@ di/                   Hilt module: @Binds impl -> interface, @Provides for DataS
 repository/           <Feature>RepositoryImpl implementing the domain interface
 local/datasource/     <Feature>LocalDataSource interface + Impl (DataStore access)
 local/datastore/      proto Serializer objects
-remote/               <Feature>RemoteDataSource extending core RemoteDataSource, Retrofit API interface, DTOs
+remote/api/           Retrofit API interface (<Feature>Api)
+remote/datasource/    <Feature>RemoteDataSource interface + Impl extending core RemoteDataSource
+remote/dto/           response DTOs
+remote/payloads/      request bodies
 ```
+
+`feature/settings/data` and `feature/auth/data` are the reference. `feature/payment/data` predates this layout (flat `api/`, `datasource/`, `dto/` and three Hilt modules); do not copy it for new code, and do not restructure it unless asked.
 
 ## Repositories
 
@@ -37,7 +42,7 @@ remote/               <Feature>RemoteDataSource extending core RemoteDataSource,
 
 - Extend `com.example.upk.core.data.remote.RemoteDataSource` and call APIs through `execute<T> { api.xxx() }` (or `executeForResponse<T>` / `executeRaw` when HTTP headers, status code or raw body are needed). It already handles success/error envelopes (`ApiResponseBody`), empty bodies and `ApiException`; do not re-implement that logic.
 - Retrofit API interfaces return `Response<ResponseBody>`; decoding happens in `execute` / `executeForResponse`.
-- DTOs are `@Serializable` data classes under `remote/model/`, with `@SerialName` when the JSON key differs from the Kotlin name.
+- DTOs are `@Serializable` data classes under `remote/dto/` (request bodies under `remote/payloads/`), with `@SerialName` when the JSON key differs from the Kotlin name.
 - Never catch `CancellationException`; if you must catch `Exception`, call `currentCoroutineContext().ensureActive()` first (see `RemoteDataSource`).
 
 ## DI
@@ -49,4 +54,3 @@ remote/               <Feature>RemoteDataSource extending core RemoteDataSource,
 
 - Every repository, data source and serializer gets unit tests with `FakeDataStore` / `Fake<Feature>LocalDataSource`.
 - Anything that needs a real file or `Context` goes to `src/androidTest` (see `SettingsDataStoreInstrumentedTest`).
-

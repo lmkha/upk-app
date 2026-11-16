@@ -8,7 +8,7 @@ description: "Domain layer rules for pure Kotlin models, repository interfaces, 
 
 Applies to `core/domain` and every `feature/<name>/domain` module.
 
-- Pure Kotlin only. No `android.*`, `androidx.*` (except `javax.inject`), no Compose, no Retrofit, no DataStore, no proto types.
+- Pure Kotlin only. No `android.*` or `androidx.*`, no Compose, no Retrofit, no DataStore, no proto types. `javax.inject` and `kotlinx.coroutines` are the only framework imports allowed.
 - Package layout inside a feature domain module:
   - `models/`      plain data classes, enums, sealed classes used by ui and data
   - `repository/`  interfaces only
@@ -26,4 +26,3 @@ Applies to `core/domain` and every `feature/<name>/domain` module.
   - `data class` with immutable `val` properties. Provide defaults only when the default is meaningful in the domain.
   - Enums with a safe default (e.g. `ThemeMode.SYSTEM`) so data mapping always has a fallback.
 - Every new use case ships with a unit test using the module's `Fake<Feature>Repository` (see `/add-use-case`).
-
