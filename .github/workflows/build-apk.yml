@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # The environment decides the build type (debug for develop, release for staging/production).
       - name: Resolve build variant
@@ -79,13 +79,13 @@ jobs:
           } >> "${GITHUB_OUTPUT}"
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: "temurin"
           java-version: "17"
 
       - name: Setup Gradle with caching
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
 
       # secrets.properties is the file the secrets Gradle plugin and app/build.gradle.kts read.
       # The SECRETS_PROPERTIES secret holds the whole file of the selected environment. ENVIRONMENT is
@@ -120,7 +120,7 @@ jobs:
         run: ./gradlew ${{ steps.variant.outputs.assemble_task }}
 
       - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: upk-${{ steps.variant.outputs.environment }}-${{ steps.variant.outputs.build_type }}-apk
           path: app/build/outputs/apk/${{ steps.variant.outputs.build_type }}/*.apk
