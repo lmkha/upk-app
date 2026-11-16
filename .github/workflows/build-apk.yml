@@ -3,14 +3,16 @@ name: Build APK
 # Builds the APK of one environment. Each GitHub Environment (develop, staging,
 # production) owns its own SECRETS_PROPERTIES and GOOGLE_SERVICES_JSON secrets.
 #
-#   push to develop  -> develop environment
-#   push to main     -> production environment
-#   manual run       -> the environment picked in the dropdown
+#   push to main                  -> develop environment (debug APK artifact)
+#   push tag v*.*.*-* (e.g. -rc.1)-> staging environment (release APK + GitHub Pre-release)
+#   push tag v*.*.*               -> production environment (release APK + GitHub Release)
+#   manual run                    -> the environment picked in the dropdown
 on:
   push:
     branches:
-      - develop
       - main
+    tags:
+      - "v*.*.*"
   workflow_dispatch:
     inputs:
       environment:
@@ -29,16 +31,16 @@ on:
         type: boolean
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
-    name: Build ${{ inputs.environment || (github.ref_name == 'main' && 'production' || 'develop') }} APK
+    name: Build ${{ inputs.environment || (startsWith(github.ref, 'refs/tags/v') && (contains(github.ref_name, '-') && 'staging' || 'production') || 'develop') }} APK
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # Selects which environment's secrets are used. Protection rules configured
-    # on the environment (required reviewers, allowed branches) apply to this job.
-    environment: ${{ inputs.environment || (github.ref_name == 'main' && 'production' || 'develop') }}
+    # on the environment (required reviewers, allowed branches/tags) apply to this job.
+    environment: ${{ inputs.environment || (startsWith(github.ref, 'refs/tags/v') && (contains(github.ref_name, '-') && 'staging' || 'production') || 'develop') }}
 
     steps:
       - name: Checkout repository
@@ -48,7 +50,7 @@ jobs:
       - name: Resolve build variant
         id: variant
         env:
-          TARGET_ENVIRONMENT: ${{ inputs.environment || (github.ref_name == 'main' && 'production' || 'develop') }}
+          TARGET_ENVIRONMENT: ${{ inputs.environment || (startsWith(github.ref, 'refs/tags/v') && (contains(github.ref_name, '-') && 'staging' || 'production') || 'develop') }}
         run: |
           case "${TARGET_ENVIRONMENT}" in
             develop)
@@ -126,3 +128,25 @@ jobs:
           path: app/build/outputs/apk/${{ steps.variant.outputs.build_type }}/*.apk
           if-no-files-found: error
           retention-days: 14
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.ref_name }}
+          ENVIRONMENT: ${{ steps.variant.outputs.environment }}
+        run: |
+          apk_file="upk-${TAG_NAME}.apk"
+          cp app/build/outputs/apk/release/*.apk "${apk_file}"
+          prerelease_flag=()
+          if [ "${ENVIRONMENT}" = "staging" ]; then
+            prerelease_flag=(--prerelease)
+          fi
+          if gh release view "${TAG_NAME}" >/dev/null 2>&1; then
+            gh release upload "${TAG_NAME}" "${apk_file}" --clobber
+          else
+            gh release create "${TAG_NAME}" "${apk_file}" \
+              --title "${TAG_NAME}" \
+              --generate-notes \
+              "${prerelease_flag[@]}"
+          fi

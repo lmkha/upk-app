@@ -1,13 +1,12 @@
 name: PR checks
 
-# Runs on every pull request targeting main or develop.
+# Runs on every pull request targeting main.
 # No `paths` filter on purpose: if this job is marked as a required status check,
 # a skipped run would leave the pull request waiting forever.
 on:
   pull_request:
     branches:
       - main
-      - develop
 
 # A new push to the same pull request cancels the run that is still in progress.
 concurrency:
