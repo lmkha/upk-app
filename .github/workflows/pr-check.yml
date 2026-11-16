@@ -42,19 +42,27 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       # local.properties is the base file the secrets Gradle plugin reads for every flavor.
-      # Each job builds one environment, so its values go straight into that file.
-      # A new per-environment value needs one more env entry and echo line here.
-      - name: Generate local.properties and google-services.json from environment secrets
+      # Each job builds one environment, so the whole properties file of that environment
+      # is written straight into local.properties.
+      - name: Generate local.properties from environment secrets
         env:
-          API_URL: ${{ secrets.API_URL }}
-          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          PROPERTIES: ${{ secrets.PROPERTIES }}
         run: |
-          if [ -z "${API_URL}" ] || [ -z "${GOOGLE_SERVICES_JSON}" ]; then
-            echo "API_URL or GOOGLE_SERVICES_JSON is not set for the develop environment." >&2
+          if [ -z "${PROPERTIES}" ]; then
+            echo "PROPERTIES is not set for the develop environment." >&2
             exit 1
           fi
-          echo "API_URL=\"${API_URL}\"" >> local.properties
-          echo "${GOOGLE_SERVICES_JSON}" > app/google-services.json
+          printf '%s\n' "${PROPERTIES}" >> local.properties
+
+      - name: Generate google-services.json from environment secrets
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -z "${GOOGLE_SERVICES_JSON}" ]; then
+            echo "GOOGLE_SERVICES_JSON is not set for the develop environment." >&2
+            exit 1
+          fi
+          printf '%s\n' "${GOOGLE_SERVICES_JSON}" > app/google-services.json
 
       # Every module has the dev / staging / prod flavors, so one task name covers the whole project.
       - name: Run unit tests

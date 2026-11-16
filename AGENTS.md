@@ -75,13 +75,13 @@ Every module has the `dev`, `staging` and `prod` flavors, so task names always c
 - The flavors are declared once, in the `upk.flavors` convention plugin (`build-logic/src/main/kotlin/upk.flavors.gradle.kts`). Every Android module applies it with `alias(libs.plugins.upkFlavors)`; a module without it cannot be resolved by the others. Never declare `flavorDimensions` or `productFlavors { create(...) }` in a module build file; `app` only customises its flavors (`applicationIdSuffix`).
 - Per-environment values come from properties files at the repository root, all git-ignored. The secrets Gradle plugin turns every key of `local.properties` into a `BuildConfig` field of the module that applies it, then overrides it with the keys of `<flavor>.properties` (`dev.properties`, `staging.properties`, `prod.properties`). A flavor without its own file uses the `local.properties` values.
 - A module that needs such a value applies `alias(libs.plugins.secrets)`, sets `buildFeatures { buildConfig = true }` and reads its own `BuildConfig` (see `core/data` and `NetworkModule`). Do not pass these values between modules through Hilt providers or wrapper classes, and do not write `buildConfigField` lines by hand.
-- To add a per-environment value, add the key to the properties files (and to the GitHub Environment secrets plus the "Generate local.properties" step of both workflows).
+- To add a per-environment value, add the key to `<flavor>.properties` locally and update the `PROPERTIES` secret in each GitHub Environment.
 - `google-services.json` must contain a client for the applicationId being built. Place one file with all three clients at `app/google-services.json`, or one file per flavor at `app/src/<flavor>/google-services.json`. Both locations are git-ignored.
 
 CI:
 
 - `.github/workflows/pr-check.yml` runs on every pull request to `main` or `develop`, in the `develop` environment: `testDevDebugUnitTest`, `lintDevDebug`, `:app:assembleDevDebug` and `assembleDevDebugAndroidTest`. Run the same tasks locally before opening a PR.
-- `.github/workflows/build-apk.yml` builds the APK of one environment: push to `develop` builds dev, push to `main` builds prod, a manual run builds the selected environment. Each GitHub Environment holds its own `API_URL` and `GOOGLE_SERVICES_JSON` secrets.
+- `.github/workflows/build-apk.yml` builds the APK of one environment: push to `develop` builds dev, push to `main` builds prod, a manual run builds the selected environment. Each GitHub Environment holds its own `PROPERTIES` and `GOOGLE_SERVICES_JSON` secrets.
 
 Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML reports: `<module>/build/reports/tests/testDevDebugUnitTest/index.html`.
 
