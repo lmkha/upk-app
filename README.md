@@ -9,23 +9,33 @@ Multi-module Android app built with Kotlin, Jetpack Compose, Hilt, Retrofit and 
 
 ## Getting started
 
-The build needs two files that are not in the repository. Ask the project owner for their contents.
+The build needs files that are not in the repository: `secrets.properties` and `app/google-services.json`. The project owner hands them out in a folder named `secrets`, with one subfolder per environment. You may receive only some of the environments.
 
-1. Create `secrets.properties` in the repository root from the template and fill in the values of the environment you want to build:
+1. Put the `secrets` folder in the repository root:
 
-   ```bash
-   cp secrets.properties.example secrets.properties
+   ```text
+   secrets/
+     dev/
+       secrets.properties
+       google-services.json
+     staging/
+     prod/
    ```
 
-2. Put the Firebase config at `app/google-services.json`. It must contain a client for the `applicationId` of that environment (see [Environments](#environments)).
+2. Copy the files of one environment into place:
 
-3. Build the debug APK, or run the `app` configuration from Android Studio:
+   ```bash
+   scripts/use-env.sh dev      # macOS, Linux
+   scripts\use-env.bat dev     # Windows
+   ```
+
+3. Build the debug APK, or sync Gradle and run the `app` configuration from Android Studio:
 
    ```bash
    ./gradlew :app:assembleDebug
    ```
 
-Both files are git-ignored. Never commit them.
+`secrets/` and the copied files are git-ignored. Never commit them.
 
 ## Environments
 
@@ -37,7 +47,9 @@ One build targets one environment. The `ENVIRONMENT` key in `secrets.properties`
 | `staging` | `com.example.upk.staging` | UPK Staging |
 | `prod` | `com.example.upk` | UPK |
 
-To switch environment, replace the values in `secrets.properties` and rebuild. Replace `app/google-services.json` too, unless it already contains the clients of all three environments.
+To switch environment, run the script again with another name, then sync Gradle. The script overwrites `secrets.properties` and `app/google-services.json`, so change values in `secrets/`, not in the copies.
+
+The script writes `ENVIRONMENT` itself, from the name of the subfolder. The files in `secrets/` do not need that key.
 
 The build fails when `secrets.properties` is missing or `ENVIRONMENT` is not one of the values above.
 
@@ -45,9 +57,11 @@ The build fails when `secrets.properties` is missing or `ENVIRONMENT` is not one
 
 Every key in `secrets.properties` becomes a `BuildConfig` field in the modules that apply the secrets Gradle plugin (for example `BuildConfig.API_URL` in `core/data`). To add one:
 
-1. Add the key to your `secrets.properties`.
-2. Add the key, without a value, to `secrets.properties.example`.
-3. Add the key to the `SECRETS_PROPERTIES` secret of each GitHub Environment.
+1. Add the key to `secrets/<environment>/secrets.properties` of every environment, then run the script again.
+2. Add the key, without a value, to `secrets.properties.example`. The script refuses a folder that lacks a key listed there, which is how a teammate learns that their `secrets` folder is out of date.
+3. Add the key to the `SECRETS_PROPERTIES` secret of each GitHub Environment. Its content is the same as the file in `secrets/`.
+
+To add another file to the setup, add it to `scripts/use-env.sh` and `scripts/use-env.bat`.
 
 ## Project structure
 
@@ -58,6 +72,7 @@ feature/<name>/domain/   models, repository interfaces, use cases
 feature/<name>/data/     repository implementations, local and remote data sources
 feature/<name>/ui/       Compose screens and ViewModels
 build-logic/             Gradle convention plugins
+scripts/                 environment setup and repository maintenance scripts
 ```
 
 Features: `auth`, `home`, `payment`, `settings`. Dependencies point one way: `ui -> domain <- data`.

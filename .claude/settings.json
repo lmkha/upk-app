@@ -18,6 +18,7 @@
     "deny": [
       "Read(./local.properties)",
       "Read(./secrets.properties)",
+      "Read(./secrets/**)",
       "Read(**/google-services.json)",
       "Read(**/*.jks)",
       "Read(**/*.keystore)",

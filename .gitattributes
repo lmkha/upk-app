@@ -1,0 +1,4 @@
+# Scripts must keep the line endings of the shell that runs them, whatever the
+# checkout settings of the machine are.
+scripts/*.sh text eol=lf
+scripts/*.bat text eol=crlf
