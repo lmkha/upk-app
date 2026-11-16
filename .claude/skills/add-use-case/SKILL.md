@@ -31,7 +31,7 @@ class <UseCaseName>UseCase @Inject constructor(
    - the default/initial value,
    - the use case forwards its argument to the repository exactly once,
    - the latest repository value is returned.
-4. Run `./gradlew :feature:<feature>:domain:testDevDebugUnitTest` and show the result.
+4. Run `./gradlew :feature:<feature>:domain:testDebugUnitTest` and show the result.
 5. Finish the reply with:
 
 ```bash

@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.upkFlavors)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
@@ -25,8 +24,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    // BuildConfig fields come from the secrets plugin: every key of local.properties,
-    // overridden by <flavor>.properties (dev.properties, staging.properties, prod.properties).
+    // BuildConfig fields come from the secrets plugin: every key of local.properties.
     buildFeatures {
         buildConfig = true
     }

@@ -16,11 +16,6 @@
     ],
     "deny": [
       "Read(./local.properties)",
-      "Read(**/debug.properties)",
-      "Read(**/release.properties)",
-      "Read(**/dev.properties)",
-      "Read(**/staging.properties)",
-      "Read(**/prod.properties)",
       "Read(**/google-services.json)",
       "Read(**/*.jks)",
       "Read(**/*.keystore)",

@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.upkFlavors)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
 }

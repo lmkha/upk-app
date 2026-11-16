@@ -16,7 +16,7 @@ Arguments: `<feature> <Name>` for a new repository, or `<feature> <ExistingRepos
 5. Tests:
    - `domain/src/test/.../Fake<Name>Repository.kt` (in-memory, call counters, `private set`).
    - `data/src/test/.../repository/<Name>RepositoryImplTest.kt` with a fake data source: every mapping branch, `distinctUntilChanged`, input normalization, set-then-get.
-6. Run `./gradlew :feature:<feature>:data:testDevDebugUnitTest :feature:<feature>:domain:testDevDebugUnitTest`.
+6. Run `./gradlew :feature:<feature>:data:testDebugUnitTest :feature:<feature>:domain:testDebugUnitTest`.
 
 ## Extending an existing repository
 

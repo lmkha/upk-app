@@ -1,14 +1,21 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.upkFlavors)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
+}
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.isFile) {
+        file.inputStream().use(::load)
+    }
 }
 
 android {
@@ -19,25 +26,14 @@ android {
 
     defaultConfig {
         applicationId = "com.example.upk"
+        applicationIdSuffix = localProperties.getProperty("APP_ID_SUFFIX")?.trim()?.takeIf { it.isNotEmpty() }
         minSdk = 29
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
+        versionNameSuffix = localProperties.getProperty("VERSION_NAME_SUFFIX")?.trim()?.takeIf { it.isNotEmpty() }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    // The dev, staging and prod flavors are declared by the upk.flavors convention plugin.
-    // Only what is specific to the installable app is configured here.
-    productFlavors {
-        getByName("dev") {
-            applicationIdSuffix = ".dev"
-            versionNameSuffix = "-dev"
-        }
-        getByName("staging") {
-            applicationIdSuffix = ".staging"
-            versionNameSuffix = "-staging"
-        }
     }
 
     buildTypes {

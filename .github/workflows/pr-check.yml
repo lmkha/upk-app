@@ -41,9 +41,8 @@ jobs:
       - name: Setup Gradle with caching
         uses: gradle/actions/setup-gradle@v4
 
-      # local.properties is the base file the secrets Gradle plugin reads for every flavor.
-      # Each job builds one environment, so the whole properties file of that environment
-      # is written straight into local.properties.
+      # local.properties is the file the secrets Gradle plugin and app/build.gradle.kts read.
+      # The whole properties file of the develop environment is written straight into it.
       - name: Generate local.properties from environment secrets
         env:
           PROPERTIES: ${{ secrets.PROPERTIES }}
@@ -64,16 +63,15 @@ jobs:
           fi
           printf '%s\n' "${GOOGLE_SERVICES_JSON}" > app/google-services.json
 
-      # Every module has the dev / staging / prod flavors, so one task name covers the whole project.
       - name: Run unit tests
-        run: ./gradlew testDevDebugUnitTest
+        run: ./gradlew testDebugUnitTest
 
       - name: Run Android lint
-        run: ./gradlew lintDevDebug
+        run: ./gradlew lintDebug
 
       # Instrumented tests need an emulator, so they are only compiled here.
       - name: Build debug APK and compile instrumented tests
-        run: ./gradlew :app:assembleDevDebug assembleDevDebugAndroidTest
+        run: ./gradlew :app:assembleDebug assembleDebugAndroidTest
 
       - name: Upload test and lint reports
         if: ${{ failure() }}

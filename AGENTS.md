@@ -15,7 +15,7 @@ core/crashlytics/         CrashReporter contract, Firebase Crashlytics implement
 feature/<name>/domain/    models, repository interfaces, use cases. Pure Kotlin, no Android deps in logic
 feature/<name>/data/      repository impls, local data sources (DataStore), DI module binding impls
 feature/<name>/ui/        Compose screens + ViewModels
-build-logic/              convention plugins (upk.flavors, upk.protobuf)
+build-logic/              convention plugins (upk.protobuf)
 gradle/libs.versions.toml version catalog; every dependency goes here, never a hardcoded version
 docs/                     the owner's testing study notes, written in Vietnamese on purpose; not a rule source
 scripts/                  repo maintenance scripts (sync-agent-rules.sh)
@@ -54,36 +54,34 @@ Detailed rules for writing tests and fakes are in `.claude/rules/testing.md` (mi
 ## Commands
 
 ```bash
-./gradlew :feature:settings:domain:testDevDebugUnitTest      # unit tests, one module
-./gradlew testDevDebugUnitTest                               # unit tests, whole project
-./gradlew :feature:settings:ui:connectedDevDebugAndroidTest  # instrumented tests (needs emulator)
-./gradlew :app:assembleDevDebug                              # build the dev debug APK
-./gradlew lintDevDebug                                       # Android lint, whole project
-./gradlew assembleDevDebugAndroidTest                        # compile instrumented tests without an emulator
+./gradlew :feature:settings:domain:testDebugUnitTest      # unit tests, one module
+./gradlew testDebugUnitTest                               # unit tests, whole project
+./gradlew :feature:settings:ui:connectedDebugAndroidTest  # instrumented tests (needs emulator)
+./gradlew :app:assembleDebug                              # build the debug APK
+./gradlew lintDebug                                       # Android lint, whole project
+./gradlew assembleDebugAndroidTest                        # compile instrumented tests without an emulator
 ```
-
-Every module has the `dev`, `staging` and `prod` flavors, so task names always carry a flavor: `test<Flavor>DebugUnitTest`, `assemble<Flavor><BuildType>`. The flavorless names (`testDebugUnitTest`, `lintDebug`, `assembleDebug`) no longer exist. Use `dev` for local work and verification unless the task is about another environment.
 
 ## Environments
 
-| Flavor | applicationId | GitHub Environment | CI build | Branch |
-| --- | --- | --- | --- | --- |
-| `dev` | `com.example.upk.dev` | `develop` | `assembleDevDebug` | `develop` |
-| `staging` | `com.example.upk.staging` | `staging` | `assembleStagingRelease` | manual run |
-| `prod` | `com.example.upk` | `production` | `assembleProdRelease` | `main` |
+| Environment | `APP_ID_SUFFIX` | `applicationId` | GitHub Environment | CI build | Branch |
+| --- | --- | --- | --- | --- | --- |
+| `dev` | `.dev` | `com.example.upk.dev` | `develop` | `assembleDebug` | `develop` |
+| `staging` | `.staging` | `com.example.upk.staging` | `staging` | `assembleRelease` | manual run |
+| `prod` | *(empty)* | `com.example.upk` | `production` | `assembleRelease` | `main` |
 
-- The flavors are declared once, in the `upk.flavors` convention plugin (`build-logic/src/main/kotlin/upk.flavors.gradle.kts`). Every Android module applies it with `alias(libs.plugins.upkFlavors)`; a module without it cannot be resolved by the others. Never declare `flavorDimensions` or `productFlavors { create(...) }` in a module build file; `app` only customises its flavors (`applicationIdSuffix`).
-- Per-environment values come from properties files at the repository root, all git-ignored. The secrets Gradle plugin turns every key of `local.properties` into a `BuildConfig` field of the module that applies it, then overrides it with the keys of `<flavor>.properties` (`dev.properties`, `staging.properties`, `prod.properties`). A flavor without its own file uses the `local.properties` values.
-- A module that needs such a value applies `alias(libs.plugins.secrets)`, sets `buildFeatures { buildConfig = true }` and reads its own `BuildConfig` (see `core/data` and `NetworkModule`). Do not pass these values between modules through Hilt providers or wrapper classes, and do not write `buildConfigField` lines by hand.
-- To add a per-environment value, add the key to `<flavor>.properties` locally and update the `PROPERTIES` secret in each GitHub Environment.
-- `google-services.json` must contain a client for the applicationId being built. Place one file with all three clients at `app/google-services.json`, or one file per flavor at `app/src/<flavor>/google-services.json`. Both locations are git-ignored.
+- Per-environment values live in `local.properties` at the repository root (git-ignored). There are no Gradle `productFlavors`; each build targets one environment configured via `local.properties`.
+- `app/build.gradle.kts` reads `APP_ID_SUFFIX` and `VERSION_NAME_SUFFIX` from `local.properties` so `dev`, `staging` and `prod` builds have distinct `applicationId` values and can be installed side by side.
+- The secrets Gradle plugin turns every key of `local.properties` into a `BuildConfig` field of the module that applies it. A module that needs such a value applies `alias(libs.plugins.secrets)`, sets `buildFeatures { buildConfig = true }` and reads its own `BuildConfig` (see `core/data` and `NetworkModule`). Do not pass these values between modules through Hilt providers or wrapper classes, and do not write `buildConfigField` lines by hand.
+- To add a per-environment value, add the key to `local.properties` locally and update the `PROPERTIES` secret in each GitHub Environment.
+- `app/google-services.json` (git-ignored) must contain a client for the `applicationId` being built.
 
 CI:
 
-- `.github/workflows/pr-check.yml` runs on every pull request to `main` or `develop`, in the `develop` environment: `testDevDebugUnitTest`, `lintDevDebug`, `:app:assembleDevDebug` and `assembleDevDebugAndroidTest`. Run the same tasks locally before opening a PR.
-- `.github/workflows/build-apk.yml` builds the APK of one environment: push to `develop` builds dev, push to `main` builds prod, a manual run builds the selected environment. Each GitHub Environment holds its own `PROPERTIES` and `GOOGLE_SERVICES_JSON` secrets.
+- `.github/workflows/pr-check.yml` runs on every pull request to `main` or `develop`, in the `develop` environment: `testDebugUnitTest`, `lintDebug`, `:app:assembleDebug` and `assembleDebugAndroidTest`. Run the same tasks locally before opening a PR.
+- `.github/workflows/build-apk.yml` builds the APK of one environment: push to `develop` builds dev (`assembleDebug`), push to `main` builds prod (`assembleRelease`), a manual run builds the selected environment. Each GitHub Environment holds its own `PROPERTIES` and `GOOGLE_SERVICES_JSON` secrets.
 
-Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML reports: `<module>/build/reports/tests/testDevDebugUnitTest/index.html`.
+Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML reports: `<module>/build/reports/tests/testDebugUnitTest/index.html`.
 
 ## Git conventions
 

@@ -44,7 +44,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # The environment decides both the product flavor and the build type.
+      # The environment decides the build type (debug for develop, release for staging/production).
       - name: Resolve build variant
         id: variant
         env:
@@ -52,19 +52,12 @@ jobs:
         run: |
           case "${TARGET_ENVIRONMENT}" in
             develop)
-              flavor=dev; build_type=debug
-              assemble_task=":app:assembleDevDebug"
-              test_task="testDevDebugUnitTest"
+              build_type=debug
+              assemble_task=":app:assembleDebug"
               ;;
-            staging)
-              flavor=staging; build_type=release
-              assemble_task=":app:assembleStagingRelease"
-              test_task="testStagingDebugUnitTest"
-              ;;
-            production)
-              flavor=prod; build_type=release
-              assemble_task=":app:assembleProdRelease"
-              test_task="testProdDebugUnitTest"
+            staging|production)
+              build_type=release
+              assemble_task=":app:assembleRelease"
               ;;
             *)
               echo "Unknown environment: ${TARGET_ENVIRONMENT}" >&2
@@ -72,10 +65,9 @@ jobs:
               ;;
           esac
           {
-            echo "flavor=${flavor}"
+            echo "environment=${TARGET_ENVIRONMENT}"
             echo "build_type=${build_type}"
             echo "assemble_task=${assemble_task}"
-            echo "test_task=${test_task}"
           } >> "${GITHUB_OUTPUT}"
 
       - name: Set up JDK 17
@@ -87,7 +79,7 @@ jobs:
       - name: Setup Gradle with caching
         uses: gradle/actions/setup-gradle@v4
 
-      # local.properties is the base file the secrets Gradle plugin reads for every flavor.
+      # local.properties is the file the secrets Gradle plugin and app/build.gradle.kts read.
       # Each job builds one environment, so the whole properties file of that environment
       # is written straight into local.properties.
       - name: Generate local.properties from environment secrets
@@ -110,10 +102,9 @@ jobs:
           fi
           printf '%s\n' "${GOOGLE_SERVICES_JSON}" > app/google-services.json
 
-      # Runs the unit tests of every module in the flavor being built.
       - name: Run unit tests
         if: ${{ github.event_name == 'push' || inputs.run_tests }}
-        run: ./gradlew ${{ steps.variant.outputs.test_task }}
+        run: ./gradlew testDebugUnitTest
 
       - name: Build APK
         run: ./gradlew ${{ steps.variant.outputs.assemble_task }}
@@ -121,7 +112,7 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: upk-${{ steps.variant.outputs.flavor }}-${{ steps.variant.outputs.build_type }}-apk
-          path: app/build/outputs/apk/${{ steps.variant.outputs.flavor }}/${{ steps.variant.outputs.build_type }}/*.apk
+          name: upk-${{ steps.variant.outputs.environment }}-${{ steps.variant.outputs.build_type }}-apk
+          path: app/build/outputs/apk/${{ steps.variant.outputs.build_type }}/*.apk
           if-no-files-found: error
           retention-days: 14

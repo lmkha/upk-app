@@ -7,9 +7,6 @@
 .externalNativeBuild
 .cxx
 local.properties
-dev.properties
-staging.properties
-prod.properties
 google-services.json
 .kotlin/
 /.idea/
