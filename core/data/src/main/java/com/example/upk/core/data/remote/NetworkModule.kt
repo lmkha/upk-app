@@ -49,7 +49,7 @@ object NetworkModule {
     @Singleton
     fun provideUnauthenticatedRetrofit(
         @UnauthenticatedOkHttpClient okHttpClient: OkHttpClient,
-        json: Json
+        json: Json,
     ): Retrofit {
         val contentType = "application/json".toMediaType()
         return Retrofit.Builder()
@@ -64,7 +64,7 @@ object NetworkModule {
     @Singleton
     fun provideAuthenticatedRetrofit(
         @AuthenticatedOkHttpClient okHttpClient: OkHttpClient,
-        json: Json
+        json: Json,
     ): Retrofit {
         val contentType = "application/json".toMediaType()
         return Retrofit.Builder()
