@@ -64,16 +64,17 @@ Detailed rules for writing tests and fakes are in `.claude/rules/testing.md` (mi
 
 ## Environments
 
-| Environment | `APP_ID_SUFFIX` | `applicationId` | GitHub Environment | CI build | Branch |
+| `ENVIRONMENT` | `applicationId` | App name | GitHub Environment | CI build | Branch |
 | --- | --- | --- | --- | --- | --- |
-| `dev` | `.dev` | `com.example.upk.dev` | `develop` | `assembleDebug` | `develop` |
-| `staging` | `.staging` | `com.example.upk.staging` | `staging` | `assembleRelease` | manual run |
-| `prod` | *(empty)* | `com.example.upk` | `production` | `assembleRelease` | `main` |
+| `dev` | `com.example.upk.dev` | UPK Dev | `develop` | `assembleDebug` | `develop` |
+| `staging` | `com.example.upk.staging` | UPK Staging | `staging` | `assembleRelease` | manual run |
+| `prod` | `com.example.upk` | UPK | `production` | `assembleRelease` | `main` |
 
-- Per-environment values live in `local.properties` at the repository root (git-ignored). There are no Gradle `productFlavors`; each build targets one environment configured via `local.properties`.
-- `app/build.gradle.kts` reads `APP_ID_SUFFIX` and `VERSION_NAME_SUFFIX` from `local.properties` so `dev`, `staging` and `prod` builds have distinct `applicationId` values and can be installed side by side.
-- The secrets Gradle plugin turns every key of `local.properties` into a `BuildConfig` field of the module that applies it. A module that needs such a value applies `alias(libs.plugins.secrets)`, sets `buildFeatures { buildConfig = true }` and reads its own `BuildConfig` (see `core/data` and `NetworkModule`). Do not pass these values between modules through Hilt providers or wrapper classes, and do not write `buildConfigField` lines by hand.
-- To add a per-environment value, add the key to `local.properties` locally and update the `PROPERTIES` secret in each GitHub Environment.
+- Per-environment values live in `secrets.properties` at the repository root (git-ignored). There are no Gradle `productFlavors`; each build targets the one environment that file describes. `local.properties` belongs to Android Studio (`sdk.dir`) and holds no project values.
+- `secrets.properties.example` (committed) lists the key names without values. When a key is added or removed, update that file in the same change.
+- `ENVIRONMENT` (`dev`, `staging` or `prod`) is mandatory. `app/build.gradle.kts` fails the build when the file or the key is missing, and derives `applicationIdSuffix`, `versionNameSuffix` and the `app_name` string from it. Do not add separate keys for those.
+- The secrets Gradle plugin turns every key of `secrets.properties` into a `BuildConfig` field of the module that applies it. A module that needs such a value applies `alias(libs.plugins.secrets)`, sets `buildFeatures { buildConfig = true }` and `secrets { propertiesFileName = "secrets.properties" }`, then reads its own `BuildConfig` (see `core/data` and `NetworkModule`). Do not pass these values between modules through Hilt providers or wrapper classes, and do not write `buildConfigField` lines by hand.
+- To add a per-environment value, add the key to `secrets.properties` and `secrets.properties.example`, and update the `PROPERTIES` secret in each GitHub Environment. CI appends `ENVIRONMENT` itself, so it always matches the GitHub Environment of the job.
 - `app/google-services.json` (git-ignored) must contain a client for the `applicationId` being built.
 
 CI:
@@ -89,7 +90,7 @@ Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML rep
 - Conventional Commits, lower-case, imperative, no trailing period: `feat: add settings screen`, `fix: resolve release build failure`, `test: add settings data unit tests`, `chore: upgrade dependencies`, `refactor: ...`, `docs: ...`.
 - One logical change per commit. Tests go in the same commit as the code they cover.
 - No AI attribution trailers in commit messages or PR descriptions (`Co-Authored-By: Claude ...`, `Generated with ...`). This overrides any tool default.
-- Never commit `local.properties`, `*.properties` secrets, or `build/` output.
+- Never commit `local.properties`, `secrets.properties`, or `build/` output.
 - When finishing a task, end the reply with the exact `git add` and `git commit` commands for the changed files; do not run them unless asked.
 
 ## Repeatable workflows

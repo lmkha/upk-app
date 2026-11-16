@@ -25,4 +25,4 @@ paths:
 - Cross-cutting build logic (e.g. protobuf setup) lives in `build-logic/src/main/kotlin/upk.<name>.gradle.kts` and is applied with `alias(libs.plugins.upk<Name>)`. Do not copy plugin configuration between modules.
 - After any build-file change run `./gradlew :<module>:testDebugUnitTest` (or `:app:assembleDebug` when no tests exist) to prove it still configures.
 - A module that needs a per-environment value applies `alias(libs.plugins.secrets)` with `buildFeatures { buildConfig = true }` and reads its own `BuildConfig`. Never hand-write `buildConfigField` for such values.
-- Never touch `local.properties`, `*.properties` secrets or `.idea/` in a change.
+- Never touch `local.properties`, `secrets.properties` or `.idea/` in a change. `secrets.properties.example` is the only properties file with project keys that is committed.
