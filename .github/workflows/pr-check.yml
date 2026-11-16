@@ -72,8 +72,9 @@ jobs:
         run: ./gradlew lintDebug
 
       # Instrumented tests need an emulator, so they are only compiled here.
+      # compileDebugAndroidTestKotlin stops before dexing and packaging: no test APK is ever installed on CI.
       - name: Build debug APK and compile instrumented tests
-        run: ./gradlew :app:assembleDebug assembleDebugAndroidTest
+        run: ./gradlew :app:assembleDebug compileDebugAndroidTestKotlin
 
       - name: Upload test and lint reports
         if: ${{ failure() }}

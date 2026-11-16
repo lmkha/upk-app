@@ -59,7 +59,7 @@ Detailed rules for writing tests and fakes are in `.claude/rules/testing.md` (mi
 ./gradlew :feature:settings:ui:connectedDebugAndroidTest  # instrumented tests (needs emulator)
 ./gradlew :app:assembleDebug                              # build the debug APK
 ./gradlew lintDebug                                       # Android lint, whole project
-./gradlew assembleDebugAndroidTest                        # compile instrumented tests without an emulator
+./gradlew compileDebugAndroidTestKotlin                   # compile instrumented tests without an emulator
 ```
 
 ## Environments
@@ -79,7 +79,7 @@ Detailed rules for writing tests and fakes are in `.claude/rules/testing.md` (mi
 
 CI:
 
-- `.github/workflows/pr-check.yml` runs on every pull request to `main` or `develop`, in the `develop` environment: `testDebugUnitTest`, `lintDebug`, `:app:assembleDebug` and `assembleDebugAndroidTest`. Run the same tasks locally before opening a PR.
+- `.github/workflows/pr-check.yml` runs on every pull request to `main` or `develop`, in the `develop` environment: `testDebugUnitTest`, `lintDebug`, `:app:assembleDebug` and `compileDebugAndroidTestKotlin`. Run the same tasks locally before opening a PR.
 - `.github/workflows/build-apk.yml` builds the APK of one environment: push to `develop` builds dev (`assembleDebug`), push to `main` builds prod (`assembleRelease`), a manual run builds the selected environment. Each GitHub Environment holds its own `SECRETS_PROPERTIES` and `GOOGLE_SERVICES_JSON` secrets.
 
 Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML reports: `<module>/build/reports/tests/testDebugUnitTest/index.html`.

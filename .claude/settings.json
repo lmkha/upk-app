@@ -4,6 +4,7 @@
       "Bash(./gradlew *DebugUnitTest*)",
       "Bash(./gradlew *assemble*Debug*)",
       "Bash(./gradlew *lint*Debug*)",
+      "Bash(./gradlew *compileDebug*)",
       "Bash(./gradlew *dependencies*)",
       "Bash(git status*)",
       "Bash(git diff*)",
