@@ -58,7 +58,11 @@ Detailed rules for writing tests and fakes are in `.claude/rules/testing.md` (mi
 ./gradlew testDebugUnitTest                                  # unit tests, whole project
 ./gradlew :feature:settings:ui:connectedDebugAndroidTest     # instrumented tests (needs emulator)
 ./gradlew :app:assembleDebug                                 # build debug APK
+./gradlew lintDebug                                          # Android lint, whole project
+./gradlew assembleDebugAndroidTest                           # compile instrumented tests without an emulator
 ```
+
+CI: `.github/workflows/pr-check.yml` runs `testDebugUnitTest`, `lintDebug`, `:app:assembleDebug` and `assembleDebugAndroidTest` on every pull request to `main` or `develop`. Run the same tasks locally before opening a PR.
 
 Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML reports: `<module>/build/reports/tests/testDebugUnitTest/index.html`.
 
