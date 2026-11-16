@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.secrets)
     alias(libs.plugins.upkProtobuf)
 }
 
@@ -22,10 +21,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-    }
-
-    buildFeatures {
-        buildConfig = true
     }
 }
 

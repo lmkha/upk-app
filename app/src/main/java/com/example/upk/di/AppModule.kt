@@ -6,6 +6,8 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.navigation.NavHostController
+import com.example.upk.BuildConfig
+import com.example.upk.core.data.remote.ApiBaseUrl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,6 +20,10 @@ import javax.inject.Singleton
 abstract class AppModule {
 
     companion object {
+        @Provides
+        @ApiBaseUrl
+        fun provideApiBaseUrl(): String = BuildConfig.API_URL
+
         @Provides
         @Singleton
         fun provideNotificationManager(@ApplicationContext context: Context): NotificationManager {

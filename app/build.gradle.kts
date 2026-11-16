@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.secrets)
 }
 
 android {
@@ -24,6 +25,30 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    // One flavor per backend environment. Only the app module has flavors;
+    // library modules stay flavorless and receive the base URL through Hilt (@ApiBaseUrl).
+    //
+    // Per-environment values are not declared here. The secrets plugin turns every key of
+    // local.properties into a BuildConfig field, then overrides it with the keys found in
+    // <flavor>.properties (dev.properties, staging.properties, prod.properties) at the
+    // repository root. Adding a value means adding a key to those files, not editing this block.
+    flavorDimensions += "environment"
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+        }
+        create("staging") {
+            dimension = "environment"
+            applicationIdSuffix = ".staging"
+            versionNameSuffix = "-staging"
+        }
+        create("prod") {
+            dimension = "environment"
+        }
     }
 
     buildTypes {
@@ -43,6 +68,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

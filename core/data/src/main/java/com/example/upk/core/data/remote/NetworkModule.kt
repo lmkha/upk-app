@@ -1,6 +1,5 @@
 package com.example.upk.core.data.remote
 
-import com.example.upk.core.data.BuildConfig
 import com.example.upk.core.data.remote.interceptor.AcceptLanguageInterceptor
 import com.example.upk.core.data.remote.interceptor.AuthInterceptor
 import com.example.upk.core.data.remote.interceptor.TokenAuthenticator
@@ -49,11 +48,12 @@ object NetworkModule {
     @Singleton
     fun provideUnauthenticatedRetrofit(
         @UnauthenticatedOkHttpClient okHttpClient: OkHttpClient,
-        json: Json
+        @ApiBaseUrl baseUrl: String,
+        json: Json,
     ): Retrofit {
         val contentType = "application/json".toMediaType()
         return Retrofit.Builder()
-            .baseUrl(BuildConfig.API_URL)
+            .baseUrl(baseUrl)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
@@ -64,11 +64,12 @@ object NetworkModule {
     @Singleton
     fun provideAuthenticatedRetrofit(
         @AuthenticatedOkHttpClient okHttpClient: OkHttpClient,
-        json: Json
+        @ApiBaseUrl baseUrl: String,
+        json: Json,
     ): Retrofit {
         val contentType = "application/json".toMediaType()
         return Retrofit.Builder()
-            .baseUrl(BuildConfig.API_URL)
+            .baseUrl(baseUrl)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
