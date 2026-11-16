@@ -18,7 +18,7 @@ feature/<name>/ui/        Compose screens + ViewModels
 build-logic/              convention plugins (upk.protobuf)
 gradle/libs.versions.toml version catalog; every dependency goes here, never a hardcoded version
 docs/                     the owner's testing study notes, written in Vietnamese on purpose; not a rule source
-scripts/                  repo maintenance scripts (sync-agent-rules.sh)
+scripts/                  environment setup (use-env.sh, use-env.bat), repo maintenance (sync-agent-rules.sh)
 ```
 
 Current features: `auth`, `home`, `payment`, `settings`. Package root is `com.example.upk`, module packages follow the path (e.g. `com.example.upk.settings.data`).
@@ -71,10 +71,12 @@ Detailed rules for writing tests and fakes are in `.claude/rules/testing.md` (mi
 | `prod` | `com.example.upk` | UPK | `production` | `assembleRelease` | `main` |
 
 - Per-environment values live in `secrets.properties` at the repository root (git-ignored). There are no Gradle `productFlavors`; each build targets the one environment that file describes. `local.properties` belongs to Android Studio (`sdk.dir`) and holds no project values.
-- `secrets.properties.example` (committed) is the template: every key with an empty value and at most a one-line format hint in a comment above it. When a key is added or removed, update that file in the same change. Setup instructions for developers belong in `README.md`, not in the template.
+- `secrets/` at the repository root (git-ignored, handed out by the project owner) is the source of those files: one subfolder per environment (`dev`, `staging`, `prod`), each holding `secrets.properties` and `google-services.json`. `scripts/use-env.sh <environment>` (`scripts\use-env.bat` on Windows) copies one subfolder into place and appends `ENVIRONMENT` from the subfolder name. Never read or edit `secrets/`, and do not run the script unless the user asks: it overwrites `secrets.properties` and `app/google-services.json`.
+- The two scripts do the same thing and must stay in sync. A new setup file is added to the file list of both.
+- `secrets.properties.example` (committed) lists every key with an empty value and at most a one-line format hint in a comment above it. The setup script checks `secrets/<environment>/secrets.properties` against it, so when a key is added or removed, update that file in the same change. Setup instructions for developers belong in `README.md`, not in the template.
 - `ENVIRONMENT` (`dev`, `staging` or `prod`) is mandatory. `app/build.gradle.kts` fails the build when the file or the key is missing, and derives `applicationIdSuffix`, `versionNameSuffix` and the `app_name` string from it. Do not add separate keys for those.
 - The secrets Gradle plugin turns every key of `secrets.properties` into a `BuildConfig` field of the module that applies it. A module that needs such a value applies `alias(libs.plugins.secrets)`, sets `buildFeatures { buildConfig = true }` and `secrets { propertiesFileName = "secrets.properties" }`, then reads its own `BuildConfig` (see `core/data` and `NetworkModule`). Do not pass these values between modules through Hilt providers or wrapper classes, and do not write `buildConfigField` lines by hand.
-- To add a per-environment value, add the key to `secrets.properties` and `secrets.properties.example`, and update the `SECRETS_PROPERTIES` secret in each GitHub Environment. CI appends `ENVIRONMENT` itself, so it always matches the GitHub Environment of the job.
+- To add a per-environment value, add the key to `secrets.properties.example`, then ask the user to add it to `secrets/<environment>/secrets.properties` of every environment and to the `SECRETS_PROPERTIES` secret in each GitHub Environment. CI appends `ENVIRONMENT` itself, so it always matches the GitHub Environment of the job.
 - `app/google-services.json` (git-ignored) must contain a client for the `applicationId` being built.
 
 CI:
@@ -90,7 +92,7 @@ Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML rep
 - Conventional Commits, lower-case, imperative, no trailing period: `feat: add settings screen`, `fix: resolve release build failure`, `test: add settings data unit tests`, `chore: upgrade dependencies`, `refactor: ...`, `docs: ...`.
 - One logical change per commit. Tests go in the same commit as the code they cover.
 - No AI attribution trailers in commit messages or PR descriptions (`Co-Authored-By: Claude ...`, `Generated with ...`). This overrides any tool default.
-- Never commit `local.properties`, `secrets.properties`, or `build/` output.
+- Never commit `local.properties`, `secrets.properties`, `secrets/`, or `build/` output.
 - When finishing a task, end the reply with the exact `git add` and `git commit` commands for the changed files; do not run them unless asked.
 
 ## Repeatable workflows
