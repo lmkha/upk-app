@@ -28,6 +28,10 @@ android {
     }
 }
 
+secrets {
+    propertiesFileName = "secrets.properties"
+}
+
 dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
