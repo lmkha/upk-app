@@ -49,7 +49,7 @@ One build targets one environment. The `ENVIRONMENT` key in `secrets.properties`
 
 To switch environment, run the script again with another name, then sync Gradle. The script removes `secrets.properties` and `app/google-services.json` and writes them again, so change values in `secrets/`, not in the copies. If it fails halfway, a file is missing and the build stops; run the script again.
 
-Each `secrets/<environment>/secrets.properties` starts with its own `ENVIRONMENT` line (`ENVIRONMENT=dev` in `secrets/dev/`, and so on). The script copies the files as they are.
+The script writes `ENVIRONMENT` itself, from the name of the subfolder, so the files in `secrets/` must not define it; the script stops if one does. In CI, the GitHub Environment of the job decides it in the same way.
 
 The build fails when `secrets.properties` is missing or `ENVIRONMENT` is not one of the values above.
 
@@ -58,7 +58,7 @@ The build fails when `secrets.properties` is missing or `ENVIRONMENT` is not one
 Every key in `secrets.properties` becomes a `BuildConfig` field in the modules that apply the secrets Gradle plugin (for example `BuildConfig.API_URL` in `core/data`). To add one:
 
 1. Add the key to `secrets/<environment>/secrets.properties` of every environment, then run the script again.
-2. Add the key to the `SECRETS_PROPERTIES` secret of each GitHub Environment. Its content is the same as the file in `secrets/`, `ENVIRONMENT` line included.
+2. Add the key to the `SECRETS_PROPERTIES` secret of each GitHub Environment. Its content is the same as the file in `secrets/`, without `ENVIRONMENT`.
 
 To add another file to the setup, add it to `scripts/use-env.sh` and `scripts/use-env.bat`.
 
