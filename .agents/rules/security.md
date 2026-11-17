@@ -10,5 +10,5 @@ description: "Security and secrets handling rules."
 - Secrets reach code only from `secrets.properties` (git-ignored) through the secrets Gradle plugin and `BuildConfig`, never as string literals or hand-written `buildConfigField` values.
 - CI secrets live in GitHub Environments (`develop`, `staging`, `production`). Workflows read them as `secrets.<NAME>` and must never echo their values.
 - Do not log auth tokens, full request/response bodies with credentials, or personal data. OkHttp logging interceptor stays at `BASIC` or lower in release.
-- When a task needs a secret value, ask the user to add it to `secrets/<environment>/secrets.properties` and run the setup script again, and add the key with an empty value to `secrets.properties.example`.
+- When a task needs a secret value, ask the user to add it to `secrets/<environment>/secrets.properties` and run the setup script again.
 - Review generated diffs for accidentally included `.idea/`, `build/` or properties files before suggesting a commit.
