@@ -8,6 +8,13 @@ description: Open a pull request from the current branch to main with a standard
 ## Steps
 
 1. Preconditions: `git status` is clean, branch is not `main`, `git log main..HEAD` is non-empty. Push the branch (`git push -u origin <branch>`) only after confirming with the user if it has not been pushed yet.
+
+   If the branch is `main` and it holds commits that `origin/main` does not (`git log origin/main..HEAD`), stop. Give the user the commands that move those commits to a branch, named as the Git conventions in `AGENTS.md` describe, and run them only if asked:
+
+   ```bash
+   git switch -c <type>/<short-description>   # the new branch keeps the commits
+   git branch -f main origin/main             # local main matches the remote again
+   ```
 2. Build the description from `git log main..HEAD --oneline` and `git diff main...HEAD --stat`:
 
    ```markdown

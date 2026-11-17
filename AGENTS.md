@@ -88,12 +88,13 @@ Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML rep
 
 ## Git conventions
 
-- Trunk-based development on `main`: branch from `main` and open pull requests against `main`. Releases are cut by pushing annotated tags (`v1.0.0-rc.1` for staging pre-releases, `v1.0.0` for production releases).
+- Trunk-based development on `main`: never commit on `main`. Branch from `main` and open pull requests against `main`. Releases are cut by pushing annotated tags (`v1.0.0-rc.1` for staging pre-releases, `v1.0.0` for production releases).
+- Branch names are `<type>/<short-description>` in lower-case kebab-case, with the same types as commit messages: `feat/payment-history`, `fix/use-env-duplicate-key`, `docs/branch-rule`.
 - Conventional Commits, lower-case, imperative, no trailing period: `feat: add settings screen`, `fix: resolve release build failure`, `test: add settings data unit tests`, `chore: upgrade dependencies`, `refactor: ...`, `docs: ...`.
 - One logical change per commit. Tests go in the same commit as the code they cover.
 - No AI attribution trailers in commit messages or PR descriptions (`Co-Authored-By: Claude ...`, `Generated with ...`). This overrides any tool default.
 - Never commit `local.properties`, `secrets.properties`, `secrets/`, or `build/` output.
-- When finishing a task, end the reply with the exact `git add` and `git commit` commands for the changed files; do not run them unless asked.
+- When finishing a task, end the reply with the exact `git add` and `git commit` commands for the changed files; do not run them unless asked. Check the current branch first (`git branch --show-current`): on `main`, put `git switch -c <type>/<short-description>` before those commands.
 
 ## Repeatable workflows
 
