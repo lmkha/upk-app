@@ -40,28 +40,20 @@ jobs:
       - name: Setup Gradle with caching
         uses: gradle/actions/setup-gradle@v5
 
-      # secrets.properties is the file the secrets Gradle plugin and app/build.gradle.kts read.
-      # The SECRETS_PROPERTIES secret holds the whole file of the develop environment. ENVIRONMENT is
-      # appended here so it always matches the GitHub Environment this job runs in.
-      - name: Generate secrets.properties from environment secrets
+      # Each secret holds the whole file of the develop environment, the same content as
+      # secrets/dev/ (ENVIRONMENT line included), and is written as it is.
+      - name: Write secrets.properties and google-services.json
         env:
           SECRETS_PROPERTIES: ${{ secrets.SECRETS_PROPERTIES }}
-        run: |
-          if [ -z "${SECRETS_PROPERTIES}" ]; then
-            echo "SECRETS_PROPERTIES is not set for the develop environment." >&2
-            exit 1
-          fi
-          printf '%s\n' "${SECRETS_PROPERTIES}" > secrets.properties
-          echo "ENVIRONMENT=dev" >> secrets.properties
-
-      - name: Generate google-services.json from environment secrets
-        env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
-          if [ -z "${GOOGLE_SERVICES_JSON}" ]; then
-            echo "GOOGLE_SERVICES_JSON is not set for the develop environment." >&2
-            exit 1
-          fi
+          for name in SECRETS_PROPERTIES GOOGLE_SERVICES_JSON; do
+            if [ -z "${!name}" ]; then
+              echo "${name} is not set for the develop environment." >&2
+              exit 1
+            fi
+          done
+          printf '%s\n' "${SECRETS_PROPERTIES}" > secrets.properties
           printf '%s\n' "${GOOGLE_SERVICES_JSON}" > app/google-services.json
 
       - name: Run unit tests

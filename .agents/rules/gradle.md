@@ -28,4 +28,4 @@ description: "Gradle Kotlin DSL, version catalog, module dependency, and build-l
   - a top-level `secrets { propertiesFileName = "secrets.properties" }` block.
 - Never omit the `secrets { }` block. Without it the plugin silently reads `local.properties`, which holds no project keys, so the `BuildConfig` fields are not generated and the module fails with "Unresolved reference". `core/data/build.gradle.kts` is the reference.
 - Never hand-write `buildConfigField` for per-environment values.
-- Never touch `local.properties`, `secrets.properties`, `secrets/` or `.idea/` in a change. `secrets.properties.example` is the only properties file with project keys that is committed.
+- Never touch `local.properties`, `secrets.properties`, `secrets/` or `.idea/` in a change.
