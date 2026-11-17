@@ -57,12 +57,22 @@ done < secrets.properties.example
 [ -z "${missing_keys}" ] ||
   fail "${source_dir}/secrets.properties is missing the keys:${missing_keys}. Ask the project owner for an updated folder."
 
+# Remove the files of the previous environment before writing the new ones. If a
+# copy then fails, a file is missing and the build stops, instead of running on
+# the files of two environments.
+for entry in "${FILES[@]}"; do
+  rm -f "${entry#*:}"
+done
+
 for entry in "${FILES[@]}"; do
   cp "${source_dir}/${entry%%:*}" "${entry#*:}"
 done
 
 # The folder name is the single source of ENVIRONMENT, the same way CI appends it.
-# A later key wins, so this also overrides an ENVIRONMENT line left in the source file.
-printf '\nENVIRONMENT=%s\n' "${environment}" >> secrets.properties
+# An ENVIRONMENT line left in the source file is dropped, so the key appears once.
+{
+  sed -E '/^[[:space:]]*ENVIRONMENT[[:space:]]*=/d' "${source_dir}/secrets.properties"
+  printf '\nENVIRONMENT=%s\n' "${environment}"
+} > secrets.properties
 
 echo "Environment set to '${environment}'. Sync Gradle in Android Studio before the next build."

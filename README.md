@@ -47,7 +47,7 @@ One build targets one environment. The `ENVIRONMENT` key in `secrets.properties`
 | `staging` | `com.example.upk.staging` | UPK Staging |
 | `prod` | `com.example.upk` | UPK |
 
-To switch environment, run the script again with another name, then sync Gradle. The script overwrites `secrets.properties` and `app/google-services.json`, so change values in `secrets/`, not in the copies.
+To switch environment, run the script again with another name, then sync Gradle. The script removes `secrets.properties` and `app/google-services.json` and writes them again, so change values in `secrets/`, not in the copies. If it fails halfway, a file is missing and the build stops; run the script again.
 
 The script writes `ENVIRONMENT` itself, from the name of the subfolder. The files in `secrets/` do not need that key.
 

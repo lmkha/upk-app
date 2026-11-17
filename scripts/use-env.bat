@@ -23,7 +23,7 @@ set "SOURCE_DIR=secrets\%ENVIRONMENT_NAME%"
 if not exist "%SOURCE_DIR%\" goto :usage
 
 rem Files copied from the environment folder. When the setup needs another file, add
-rem it to this list and to the copy lines below, and to use-env.sh.
+rem it to this list, to the remove list and the copy lines below, and to use-env.sh.
 rem Check everything before copying anything, so a failure never leaves the files
 rem of two environments mixed.
 for %%F in (secrets.properties google-services.json) do (
@@ -43,11 +43,24 @@ for /f "usebackq eol=# tokens=1 delims==" %%K in ("secrets.properties.example") 
 )
 if defined MISSING_KEYS goto :missing_keys
 
+rem Remove the files of the previous environment before writing the new ones. If a
+rem copy then fails, a file is missing and the build stops, instead of running on
+rem the files of two environments.
+for %%F in ("secrets.properties" "app\google-services.json") do (
+    if exist %%F del /f /q %%F
+    if exist %%F (
+        echo error: cannot remove %%~F. 1>&2
+        exit /b 1
+    )
+)
+
 copy /y "%SOURCE_DIR%\secrets.properties" "secrets.properties" >nul || exit /b 1
 copy /y "%SOURCE_DIR%\google-services.json" "app\google-services.json" >nul || exit /b 1
 
 rem The folder name is the single source of ENVIRONMENT, the same way CI appends it.
-rem A later key wins, so this also overrides an ENVIRONMENT line left in the source file.
+rem An ENVIRONMENT line left in the source file is dropped, so the key appears once.
+rem findstr reports "no line left" through errorlevel, which is not a failure here.
+findstr /v /r /c:"^ *ENVIRONMENT *=" "%SOURCE_DIR%\secrets.properties" >"secrets.properties"
 >>"secrets.properties" echo(
 >>"secrets.properties" echo ENVIRONMENT=%ENVIRONMENT_NAME%
 
