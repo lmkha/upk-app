@@ -7,7 +7,7 @@ description: Review the working tree, run the affected tests, and produce (or, i
 
 ## Steps
 
-1. `git status --short` and `git diff --stat`. Exclude noise: `.idea/`, `build/`, `local.properties`, `secrets.properties`. Warn if any secret-looking file is modified.
+1. `git branch --show-current`, `git status --short` and `git diff --stat`. Exclude noise: `.idea/`, `build/`, `local.properties`, `secrets.properties`. Warn if any secret-looking file is modified.
 2. Group the remaining files into logical commits (one feature or fix per commit; tests go with the code they cover; build-file and docs changes separate unless required by the code change).
 3. For each group, find the affected modules and run their tests: `./gradlew :<module>:testDebugUnitTest` (all of them in one Gradle invocation). Stop and report if anything fails.
 4. Write each message as Conventional Commits:
@@ -19,4 +19,8 @@ description: Review the working tree, run the affected tests, and produce (or, i
    git add <files>
    git commit -m "<message>"
    ```
-6. Execute them only if the user said to commit; otherwise stop at the commands. Never `git push` unless explicitly asked. Never commit on `main`.
+   Never commit on `main`. When the current branch is `main`, put the command that creates a branch before them, named as the Git conventions in `AGENTS.md` describe:
+   ```bash
+   git switch -c <type>/<short-description>
+   ```
+6. Execute them only if the user said to commit; otherwise stop at the commands. Never `git push` unless explicitly asked.
