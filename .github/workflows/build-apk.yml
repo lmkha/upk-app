@@ -30,6 +30,13 @@ on:
         default: true
         type: boolean
 
+# A newer push to main cancels the dev build that is still in progress, so only
+# the latest commit is built. Tag builds and manual runs are never cancelled: a
+# second run of the same tag, or of the same manual target, waits for the first.
+concurrency:
+  group: build-apk-${{ github.ref }}-${{ inputs.environment || 'auto' }}
+  cancel-in-progress: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+
 permissions:
   contents: write
 
