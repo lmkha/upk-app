@@ -42,12 +42,19 @@ permissions:
 
 jobs:
   build:
-    name: Build ${{ inputs.environment || (startsWith(github.ref, 'refs/tags/v') && (contains(github.ref_name, '-') && 'staging' || 'production') || 'develop') }} APK
+    # One-entry matrix, not a real fan-out: the target GitHub Environment is computed once
+    # here and read as matrix.environment below. A workflow-level "env:" value cannot do
+    # this, because the env context is not available in "name:" and "environment:".
+    strategy:
+      matrix:
+        environment:
+          - ${{ inputs.environment || (startsWith(github.ref, 'refs/tags/v') && (contains(github.ref_name, '-') && 'staging' || 'production') || 'develop') }}
+    name: Build ${{ matrix.environment }} APK
     runs-on: ubuntu-latest
     timeout-minutes: 30
     # Selects which environment's secrets are used. Protection rules configured
     # on the environment (required reviewers, allowed branches/tags) apply to this job.
-    environment: ${{ inputs.environment || (startsWith(github.ref, 'refs/tags/v') && (contains(github.ref_name, '-') && 'staging' || 'production') || 'develop') }}
+    environment: ${{ matrix.environment }}
 
     steps:
       - name: Checkout repository
@@ -58,7 +65,7 @@ jobs:
       - name: Resolve build variant
         id: variant
         env:
-          TARGET_ENVIRONMENT: ${{ inputs.environment || (startsWith(github.ref, 'refs/tags/v') && (contains(github.ref_name, '-') && 'staging' || 'production') || 'develop') }}
+          TARGET_ENVIRONMENT: ${{ matrix.environment }}
         run: |
           case "${TARGET_ENVIRONMENT}" in
             develop)
