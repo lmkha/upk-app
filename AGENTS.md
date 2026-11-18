@@ -82,6 +82,7 @@ CI:
 
 - `.github/workflows/pr-check.yml` runs on every pull request to `main`, in the `develop` environment: `testDebugUnitTest`, `lintDebug`, `:app:assembleDebug` and `compileDebugAndroidTestKotlin`. Run the same tasks locally before opening a PR.
 - `.github/workflows/build-apk.yml` builds the APK of one environment: push to `main` builds dev (`assembleDebug`), push of a pre-release tag (`v*.*.*-*`, such as `v1.0.0-rc.1`) builds staging (`assembleRelease`) and publishes a GitHub Pre-release, push of a release tag (`v*.*.*`, such as `v1.0.0`) builds prod (`assembleRelease`) and publishes a GitHub Release, and a manual run builds the selected environment. A newer push to `main` cancels the dev build still in progress; tag builds and manual runs are never cancelled. Each GitHub Environment holds its own `SECRETS_PROPERTIES` and `GOOGLE_SERVICES_JSON` secrets.
+- Both workflows write `secrets.properties` and `app/google-services.json` through `.github/scripts/write-env-files.sh`. Change how those files are written in that script, not in the workflows. It runs on CI only; `scripts/use-env.sh` is its counterpart on a developer machine.
 
 Gradle prints only failing tests. Pass `--rerun` to force re-execution. HTML reports: `<module>/build/reports/tests/testDebugUnitTest/index.html`.
 
