@@ -174,10 +174,11 @@ kotlin {
 }
 
 // A release build never falls back to the debug key: without the signing variables it stops
-// here. Debug builds and tests do not run this task. The check is ordered before R8 and the
-// Crashlytics mapping upload, so a build that cannot be signed uploads nothing.
+// here. Debug builds and tests do not run this task. R8 and the Crashlytics mapping upload
+// depend on the check, so a build that cannot be signed skips them and uploads nothing, also
+// when the build keeps going after a failure (--continue, the mode Android Studio builds in).
 tasks.named { it == "minifyReleaseWithR8" || it == "uploadCrashlyticsMappingFileRelease" }.configureEach {
-    mustRunAfter("validateSigningRelease")
+    dependsOn("validateSigningRelease")
 }
 tasks.named { it == "validateSigningRelease" }.configureEach {
     val missingVariables = missingReleaseSigningVariables
