@@ -115,11 +115,41 @@ jobs:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: bash .github/scripts/write-env-files.sh
 
+      # Release builds (staging, production) are signed with the keystore of their GitHub
+      # Environment. It is decoded into the runner's temp folder, outside the repository.
+      # app/build.gradle.kts reads its path and passwords from the UPK_RELEASE_* variables
+      # set on the "Build APK" step, and stops a release build when one is missing.
+      - name: Decode release keystore
+        id: signing
+        if: ${{ steps.variant.outputs.build_type == 'release' }}
+        env:
+          TARGET_ENVIRONMENT: ${{ steps.variant.outputs.environment }}
+          RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+          RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+        run: |
+          for name in RELEASE_KEYSTORE_BASE64 RELEASE_KEYSTORE_PASSWORD RELEASE_KEY_ALIAS RELEASE_KEY_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "${name} is not set for the ${TARGET_ENVIRONMENT} environment." >&2
+              exit 1
+            fi
+          done
+          keystore_file="${RUNNER_TEMP}/release-keystore.jks"
+          base64 --decode <<< "${RELEASE_KEYSTORE_BASE64}" > "${keystore_file}"
+          echo "keystore_file=${keystore_file}" >> "${GITHUB_OUTPUT}"
+
       - name: Run unit tests
         if: ${{ github.event_name == 'push' || inputs.run_tests }}
         run: ./gradlew testDebugUnitTest
 
+      # The signing variables are empty for a develop build, which is a debug build.
       - name: Build APK
+        env:
+          UPK_RELEASE_KEYSTORE_FILE: ${{ steps.signing.outputs.keystore_file }}
+          UPK_RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+          UPK_RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          UPK_RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
         run: ./gradlew ${{ steps.variant.outputs.assemble_task }}
 
       - name: Upload APK Artifact

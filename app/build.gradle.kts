@@ -26,15 +26,46 @@ val secretProperties = Properties().apply {
 
 // ENVIRONMENT decides the identity of the installed app. It is mandatory, so a build can
 // never fall back to the production applicationId by accident.
-val environment = secretProperties.getProperty("ENVIRONMENT")?.trim()?.removeSurrounding("\"")
-val (environmentIdSuffix, environmentVersionSuffix, environmentAppName) = when (environment) {
-    "dev" -> Triple(".dev", "-dev", "UPK Dev")
-    "staging" -> Triple(".staging", "-staging", "UPK Staging")
-    "prod" -> Triple(null, null, "UPK")
+class EnvironmentConfig(
+    val applicationIdSuffix: String?,
+    val versionNameSuffix: String?,
+    val appName: String,
+)
+
+val environment = secretProperties.getProperty("ENVIRONMENT")?.trim()
+val environmentConfig = when (environment) {
+    "dev" -> EnvironmentConfig(
+        applicationIdSuffix = ".dev",
+        versionNameSuffix = "-dev",
+        appName = "UPK Dev",
+    )
+    "staging" -> EnvironmentConfig(
+        applicationIdSuffix = ".staging",
+        versionNameSuffix = "-staging",
+        appName = "UPK Staging",
+    )
+    "prod" -> EnvironmentConfig(
+        applicationIdSuffix = null,
+        versionNameSuffix = null,
+        appName = "UPK",
+    )
     else -> throw GradleException(
         "ENVIRONMENT in secrets.properties must be dev, staging or prod, but was '$environment'."
     )
 }
+
+// Release builds are signed with a keystore that stays outside the repository. Its path and
+// passwords come from environment variables, never from secrets.properties: every key of that
+// file is compiled into BuildConfig, and so into the APK. See "Release signing" in README.md.
+val releaseSigningValues = listOf(
+    "UPK_RELEASE_KEYSTORE_FILE",
+    "UPK_RELEASE_KEYSTORE_PASSWORD",
+    "UPK_RELEASE_KEY_ALIAS",
+    "UPK_RELEASE_KEY_PASSWORD",
+).associateWith { name ->
+    providers.environmentVariable(name).orNull?.takeIf { it.isNotBlank() }
+}
+val missingReleaseSigningVariables = releaseSigningValues.filterValues { it == null }.keys.toList()
 
 android {
     namespace = "com.example.upk"
@@ -42,15 +73,24 @@ android {
         version = release(37)
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = releaseSigningValues["UPK_RELEASE_KEYSTORE_FILE"]?.let { file(it) }
+            storePassword = releaseSigningValues["UPK_RELEASE_KEYSTORE_PASSWORD"]
+            keyAlias = releaseSigningValues["UPK_RELEASE_KEY_ALIAS"]
+            keyPassword = releaseSigningValues["UPK_RELEASE_KEY_PASSWORD"]
+        }
+    }
+
     defaultConfig {
         applicationId = "com.example.upk"
-        applicationIdSuffix = environmentIdSuffix
+        applicationIdSuffix = environmentConfig.applicationIdSuffix
         minSdk = 29
         targetSdk = 37
         versionCode = 1
         versionName = "1.0"
-        versionNameSuffix = environmentVersionSuffix
-        resValue("string", "app_name", environmentAppName)
+        versionNameSuffix = environmentConfig.versionNameSuffix
+        resValue("string", "app_name", environmentConfig.appName)
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -63,7 +103,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -130,5 +170,23 @@ dependencies {
 kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.fromTarget("17")
+    }
+}
+
+// A release build never falls back to the debug key: without the signing variables it stops
+// here. Debug builds and tests do not run this task. The check is ordered before R8 and the
+// Crashlytics mapping upload, so a build that cannot be signed uploads nothing.
+tasks.named { it == "minifyReleaseWithR8" || it == "uploadCrashlyticsMappingFileRelease" }.configureEach {
+    mustRunAfter("validateSigningRelease")
+}
+tasks.named { it == "validateSigningRelease" }.configureEach {
+    val missingVariables = missingReleaseSigningVariables
+    doFirst {
+        if (missingVariables.isNotEmpty()) {
+            throw GradleException(
+                "Release builds need a signing keystore. Set the environment variables " +
+                    "${missingVariables.joinToString()}. See \"Release signing\" in README.md."
+            )
+        }
     }
 }
