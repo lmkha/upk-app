@@ -7,12 +7,12 @@ import com.example.upk.settings.domain.models.ThemeMode
 import com.example.upk.settings.domain.usecases.GetThemeModeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 sealed interface AppIntent {
     data class ScreenViewed(
@@ -27,25 +27,38 @@ data class AppUiState(
 @HiltViewModel
 class AppViewModel @Inject constructor(
     private val analyticsTracker: AnalyticsTracker,
-    getThemeModeUseCase: GetThemeModeUseCase,
+    private val getThemeModeUseCase: GetThemeModeUseCase,
 ) : ViewModel() {
 
     private var lastLoggedScreenName: String? = null
 
-    val uiState: StateFlow<AppUiState> =
-        getThemeModeUseCase()
-            .distinctUntilChanged()
-            .map { themeMode -> AppUiState(themeMode = themeMode) }
-            .catch { emit(AppUiState(themeMode = ThemeMode.SYSTEM)) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = AppUiState(),
-            )
+    private val _uiState = MutableStateFlow(AppUiState())
+    val uiState = _uiState.asStateFlow()
+
+    init {
+        observeThemeMode()
+    }
 
     fun onIntent(intent: AppIntent) {
         when (intent) {
             is AppIntent.ScreenViewed -> trackScreenView(intent.screenName)
+        }
+    }
+
+    private fun observeThemeMode() {
+        viewModelScope.launch {
+            getThemeModeUseCase()
+                .distinctUntilChanged()
+                .catch {
+                    _uiState.update {
+                        it.copy(themeMode = ThemeMode.SYSTEM)
+                    }
+                }
+                .collect { themeMode ->
+                    _uiState.update {
+                        it.copy(themeMode = themeMode)
+                    }
+                }
         }
     }
 
