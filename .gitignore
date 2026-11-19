@@ -11,6 +11,9 @@ secrets.properties
 google-services.json
 # Per-environment files handed out by the project owner; see README.md
 /secrets/
+# Signing keystores live outside the repository; see "Release signing" in README.md
+*.jks
+*.keystore
 .kotlin/
 /.idea/
 
