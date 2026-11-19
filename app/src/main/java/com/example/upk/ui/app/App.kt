@@ -25,11 +25,11 @@ import kotlinx.coroutines.flow.mapNotNull
 @Composable
 fun App(
     modifier: Modifier = Modifier,
-    onScreenViewed: (String) -> Unit,
+    onIntent: (AppIntent) -> Unit,
 ) {
     val navController = rememberNavController()
     val lifecycleOwner = LocalLifecycleOwner.current
-    val currentOnScreenViewed by rememberUpdatedState(onScreenViewed)
+    val currentOnIntent by rememberUpdatedState(onIntent)
 
     LaunchedEffect(navController, lifecycleOwner) {
         navController.currentBackStackEntryFlow
@@ -37,7 +37,7 @@ fun App(
             .mapNotNull { entry -> entry.destination.toAnalyticsScreenName() }
             .distinctUntilChanged()
             .collect { screenName ->
-                currentOnScreenViewed(screenName)
+                currentOnIntent(AppIntent.ScreenViewed(screenName))
             }
     }
 
