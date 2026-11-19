@@ -14,7 +14,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * Compose UI test for [App]. Verifies start destination rendering and screen-view callback wiring.
+ * Compose UI test for [App]. Verifies start destination rendering and screen-view intent wiring.
  */
 @RunWith(AndroidJUnit4::class)
 class AppTest {
@@ -22,13 +22,13 @@ class AppTest {
     @get:Rule
     val composeRule = createComposeRule()
 
-    // ---------- Start destination & analytics callback ----------
+    // ---------- Start destination & screen-view intent ----------
 
     @Test
     fun displaysHomeStartDestination() {
         composeRule.setContent {
             UPKTheme {
-                App(onScreenViewed = {})
+                App(onIntent = {})
             }
         }
 
@@ -37,50 +37,50 @@ class AppTest {
     }
 
     @Test
-    fun invokesOnScreenViewedWithHomeOnStart() {
-        val viewedScreens = mutableListOf<String>()
+    fun sendsScreenViewedIntentForHomeOnStart() {
+        val intents = mutableListOf<AppIntent>()
 
         composeRule.setContent {
             UPKTheme {
                 App(
-                    onScreenViewed = { screenName ->
-                        viewedScreens.add(screenName)
+                    onIntent = { intent ->
+                        intents.add(intent)
                     },
                 )
             }
         }
 
         composeRule.runOnIdle {
-            assertEquals(listOf("home"), viewedScreens)
+            assertEquals(listOf<AppIntent>(AppIntent.ScreenViewed("home")), intents)
         }
     }
 
     @Test
-    fun recompositionWithUpdatedOnScreenViewedDoesNotDuplicateInitialEvent() {
-        val firstCallbackEvents = mutableListOf<String>()
-        val secondCallbackEvents = mutableListOf<String>()
+    fun recompositionWithUpdatedOnIntentDoesNotDuplicateInitialIntent() {
+        val firstCallbackIntents = mutableListOf<AppIntent>()
+        val secondCallbackIntents = mutableListOf<AppIntent>()
         var useSecondCallback by mutableStateOf(false)
 
         composeRule.setContent {
             UPKTheme {
                 App(
-                    onScreenViewed = if (useSecondCallback) {
-                        { secondCallbackEvents.add(it) }
+                    onIntent = if (useSecondCallback) {
+                        { secondCallbackIntents.add(it) }
                     } else {
-                        { firstCallbackEvents.add(it) }
+                        { firstCallbackIntents.add(it) }
                     },
                 )
             }
         }
 
         composeRule.runOnIdle {
-            assertEquals(listOf("home"), firstCallbackEvents)
+            assertEquals(listOf<AppIntent>(AppIntent.ScreenViewed("home")), firstCallbackIntents)
             useSecondCallback = true
         }
 
         composeRule.runOnIdle {
-            assertEquals(listOf("home"), firstCallbackEvents)
-            assertEquals(emptyList<String>(), secondCallbackEvents)
+            assertEquals(listOf<AppIntent>(AppIntent.ScreenViewed("home")), firstCallbackIntents)
+            assertEquals(emptyList<AppIntent>(), secondCallbackIntents)
         }
     }
 }

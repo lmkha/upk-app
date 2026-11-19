@@ -19,7 +19,6 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.upk.settings.domain.models.ThemeMode
 import com.example.upk.ui.app.App
-import com.example.upk.ui.app.AppIntent
 import com.example.upk.ui.app.AppViewModel
 import com.example.upk.ui.theme.UPKTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -64,9 +63,7 @@ class MainActivity : ComponentActivity() {
             UPKTheme(darkTheme = darkTheme) {
                 App(
                     modifier = Modifier.fillMaxSize(),
-                    onScreenViewed = { screenName ->
-                        appViewModel.onIntent(AppIntent.ScreenViewed(screenName))
-                    },
+                    onIntent = appViewModel::onIntent,
                 )
             }
         }
