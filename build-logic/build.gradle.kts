@@ -11,6 +11,7 @@ repositories {
 dependencies {
     implementation(libs.android.gradle.plugin)
     implementation(libs.protobuf.gradle.plugin)
+    implementation(libs.secrets.gradle.plugin)
 }
 
 kotlin {

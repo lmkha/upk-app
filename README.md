@@ -55,10 +55,17 @@ The build fails when `secrets.properties` is missing or `ENVIRONMENT` is not one
 
 ### Adding a configuration value
 
-Every key in `secrets.properties` becomes a `BuildConfig` field in the modules that apply the secrets Gradle plugin (for example `BuildConfig.API_URL` in `core/data`). To add one:
+Every key in `secrets.properties` becomes a `BuildConfig` field in the modules that apply the `upk.secrets` convention plugin (for example `BuildConfig.API_URL` in `core/data`).
 
-1. Add the key to `secrets/<environment>/secrets.properties` of every environment, then run the script again.
+To add a new key:
+
+1. Add the key to `secrets/<environment>/secrets.properties` of every environment, then run the setup script again (`scripts/use-env.sh <env>` or `scripts\use-env.bat <env>`).
 2. Add the key to the `SECRETS_PROPERTIES` secret of each GitHub Environment. Its content is the same as the file in `secrets/`, without `ENVIRONMENT`.
+
+To read values from `secrets.properties` in a module:
+
+1. Apply `alias(libs.plugins.upk.secrets)` in the module's `build.gradle.kts` (it enables `BuildConfig` generation and configures the secrets Gradle plugin to read `secrets.properties`).
+2. Read the generated field directly from the module's `BuildConfig` (for example `BuildConfig.API_URL`).
 
 To add another file to the setup, add it to `scripts/use-env.sh` and `scripts/use-env.bat`.
 
