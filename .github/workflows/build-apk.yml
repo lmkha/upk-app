@@ -139,18 +139,23 @@ jobs:
           base64 --decode <<< "${RELEASE_KEYSTORE_BASE64}" > "${keystore_file}"
           echo "keystore_file=${keystore_file}" >> "${GITHUB_OUTPUT}"
 
-      - name: Run unit tests
-        if: ${{ github.event_name == 'push' || inputs.run_tests }}
-        run: ./gradlew testDebugUnitTest
-
+      # Run unit tests (when enabled) and build the APK in a single Gradle invocation.
       # The signing variables are empty for a develop build, which is a debug build.
-      - name: Build APK
+      - name: Run tests and build APK
         env:
+          RUN_TESTS: ${{ github.event_name == 'push' || inputs.run_tests }}
+          ASSEMBLE_TASK: ${{ steps.variant.outputs.assemble_task }}
           UPK_RELEASE_KEYSTORE_FILE: ${{ steps.signing.outputs.keystore_file }}
           UPK_RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
           UPK_RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           UPK_RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
-        run: ./gradlew ${{ steps.variant.outputs.assemble_task }}
+        run: |
+          tasks=()
+          if [ "${RUN_TESTS}" = "true" ]; then
+            tasks+=(testDebugUnitTest)
+          fi
+          tasks+=("${ASSEMBLE_TASK}")
+          ./gradlew "${tasks[@]}"
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v7
