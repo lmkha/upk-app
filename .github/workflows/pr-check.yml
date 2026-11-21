@@ -76,19 +76,12 @@ jobs:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: bash .github/scripts/write-env-files.sh
 
-      - name: Run unit tests
+      # Run unit tests, Android lint, debug APK build and instrumented test compilation
+      # in a single Gradle invocation. --continue collects test and lint failures together.
+      # compileDebugAndroidTestKotlin stops before dexing and packaging: no test APK is installed on CI.
+      - name: Run tests, lint, debug build and compile instrumented tests
         if: ${{ !github.event.pull_request.draft && steps.filter.outputs.code == 'true' }}
-        run: ./gradlew testDebugUnitTest
-
-      - name: Run Android lint
-        if: ${{ !github.event.pull_request.draft && steps.filter.outputs.code == 'true' }}
-        run: ./gradlew lintDebug
-
-      # Instrumented tests need an emulator, so they are only compiled here.
-      # compileDebugAndroidTestKotlin stops before dexing and packaging: no test APK is ever installed on CI.
-      - name: Build debug APK and compile instrumented tests
-        if: ${{ !github.event.pull_request.draft && steps.filter.outputs.code == 'true' }}
-        run: ./gradlew :app:assembleDebug compileDebugAndroidTestKotlin
+        run: ./gradlew testDebugUnitTest lintDebug :app:assembleDebug compileDebugAndroidTestKotlin --continue
 
       - name: Upload test and lint reports
         if: ${{ failure() }}
