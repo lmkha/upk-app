@@ -1,12 +1,14 @@
 name: PR checks
 
 # Runs on every pull request targeting main.
-# No `paths` filter on purpose: if this job is marked as a required status check,
-# a skipped run would leave the pull request waiting forever.
+# No top-level `paths` filter on purpose: if this job is marked as a required status check,
+# a skipped run would leave the pull request waiting forever. Instead, draft PRs and
+# docs/config-only PRs skip the Gradle steps inside the job so the required check still passes.
 on:
   pull_request:
     branches:
       - main
+    types: [opened, synchronize, reopened, ready_for_review]
 
 # A new push to the same pull request cancels the run that is still in progress.
 concurrency:
@@ -15,6 +17,7 @@ concurrency:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   verify:
@@ -28,16 +31,36 @@ jobs:
     environment: develop
 
     steps:
+      - name: Check code changes
+        id: filter
+        if: ${{ !github.event.pull_request.draft }}
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            code:
+              - 'app/**'
+              - 'core/**'
+              - 'feature/**'
+              - 'build-logic/**'
+              - 'gradle/**'
+              - '*.kts'
+              - 'gradle.properties'
+              - '.github/workflows/pr-check.yml'
+              - '.github/scripts/write-env-files.sh'
+
       - name: Checkout repository
+        if: ${{ !github.event.pull_request.draft && steps.filter.outputs.code == 'true' }}
         uses: actions/checkout@v7
 
       - name: Set up JDK 17
+        if: ${{ !github.event.pull_request.draft && steps.filter.outputs.code == 'true' }}
         uses: actions/setup-java@v6
         with:
           distribution: "temurin"
           java-version: "17"
 
       - name: Setup Gradle with caching
+        if: ${{ !github.event.pull_request.draft && steps.filter.outputs.code == 'true' }}
         uses: gradle/actions/setup-gradle@v5
 
       # This job always runs in the develop GitHub Environment (see "environment:" above), so its
@@ -45,6 +68,7 @@ jobs:
       # the secret: SECRETS_PROPERTIES holds the same content as secrets/dev/secrets.properties.
       # build-apk.yml runs the same script.
       - name: Write secrets.properties and google-services.json
+        if: ${{ !github.event.pull_request.draft && steps.filter.outputs.code == 'true' }}
         env:
           TARGET_ENVIRONMENT: develop
           APP_ENVIRONMENT: dev
@@ -53,14 +77,17 @@ jobs:
         run: bash .github/scripts/write-env-files.sh
 
       - name: Run unit tests
+        if: ${{ !github.event.pull_request.draft && steps.filter.outputs.code == 'true' }}
         run: ./gradlew testDebugUnitTest
 
       - name: Run Android lint
+        if: ${{ !github.event.pull_request.draft && steps.filter.outputs.code == 'true' }}
         run: ./gradlew lintDebug
 
       # Instrumented tests need an emulator, so they are only compiled here.
       # compileDebugAndroidTestKotlin stops before dexing and packaging: no test APK is ever installed on CI.
       - name: Build debug APK and compile instrumented tests
+        if: ${{ !github.event.pull_request.draft && steps.filter.outputs.code == 'true' }}
         run: ./gradlew :app:assembleDebug compileDebugAndroidTestKotlin
 
       - name: Upload test and lint reports
