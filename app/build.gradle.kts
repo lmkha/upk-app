@@ -2,7 +2,7 @@ import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.upk.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
@@ -69,11 +69,6 @@ val missingReleaseSigningVariables = releaseSigningValues.filterValues { it == n
 
 android {
     namespace = "com.example.upk"
-    compileSdk {
-        version = release(37) {
-            minorApiLevel = 2
-        }
-    }
 
     signingConfigs {
         create("release") {
@@ -87,14 +82,10 @@ android {
     defaultConfig {
         applicationId = "com.example.upk"
         applicationIdSuffix = environmentConfig.applicationIdSuffix
-        minSdk = 29
-        targetSdk = 37
         versionCode = 1
         versionName = "1.0"
         versionNameSuffix = environmentConfig.versionNameSuffix
         resValue("string", "app_name", environmentConfig.appName)
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -107,10 +98,6 @@ android {
             )
             signingConfig = signingConfigs.getByName("release")
         }
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
         compose = true

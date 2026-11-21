@@ -21,8 +21,8 @@ paths:
 - Module dependencies follow `ui -> domain <- data`; `app` depends on `ui` and `domain` modules, plus `data` modules only to pull their Hilt bindings. A `data` module never depends on a `ui` module and vice versa.
 - Register new modules in `settings.gradle.kts` with `include(":feature:<name>:<layer>")`, one per line, grouped by feature, no duplicates.
 - `namespace` mirrors the path: `com.example.upk.<feature>.<layer>`.
-- `compileSdk`, `minSdk`, Java target and `testInstrumentationRunner` are identical across modules; do not change them in one module only.
-- Cross-cutting build logic (e.g. protobuf setup) lives in `build-logic/src/main/kotlin/upk.<name>.gradle.kts` and is applied with `alias(libs.plugins.upk<Name>)`. Do not copy plugin configuration between modules.
+- `compileSdk`, `minSdk`, `targetSdk`, Java target and `testInstrumentationRunner` are shared through `build-logic` convention plugins (`upk.android.application`, `upk.android.library`) reading SDK versions from `gradle/libs.versions.toml`; do not duplicate them in module `build.gradle.kts` files.
+- Cross-cutting build logic lives in `build-logic/src/main/kotlin/upk.<name>.gradle.kts` and is applied via version catalog aliases (e.g. `alias(libs.plugins.upk.android.library)`, `alias(libs.plugins.upkProtobuf)`). Do not copy plugin configuration between modules.
 - After any build-file change run `./gradlew :<module>:testDebugUnitTest` (or `:app:assembleDebug` when no tests exist) to prove it still configures.
 - A module that needs a per-environment value reads its own `BuildConfig`. That takes three things in its `build.gradle.kts`, all required:
   - `alias(libs.plugins.secrets)` in `plugins`,
