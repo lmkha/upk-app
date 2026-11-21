@@ -116,9 +116,9 @@ Features: `auth`, `home`, `payment`, `settings`. Dependencies point one way: `ui
 | Workflow | Runs on | What it does |
 | --- | --- | --- |
 | `pr-check.yml` | pull request to `main` | unit tests, lint, debug build, compiles instrumented tests |
-| `build-apk.yml` | push to `main`, tag `v*.*.*`, or manual run | builds and uploads the APK of one environment, and publishes a GitHub Release on tags |
+| `build-apk.yml` | tag `v*.*.*`, or manual run | builds the APK of one environment, uploads an artifact for manual runs, and publishes a GitHub Release on tags |
 
-`build-apk.yml` builds `dev` (debug) on push to `main`, `staging` (release + GitHub Pre-release) on pre-release tags such as `v1.0.0-rc.1`, and `prod` (release + GitHub Release) on release tags such as `v1.0.0`. A manual run builds the environment you pick. When several pushes reach `main` close together, only the latest one is built: a newer push cancels the dev build still in progress. Tag builds and manual runs are never cancelled.
+`build-apk.yml` builds `staging` (release + GitHub Pre-release) on pre-release tags such as `v1.0.0-rc.1`, and `prod` (release + GitHub Release) on release tags such as `v1.0.0`. A manual run builds the environment you pick (`develop`, `staging`, or `production`) and uploads the APK as a workflow artifact. Tag builds and manual runs are never cancelled.
 
 Each GitHub Environment (`develop`, `staging`, `production`) holds two secrets: `SECRETS_PROPERTIES`, the full content of `secrets.properties` for that environment, and `GOOGLE_SERVICES_JSON`. `staging` and `production` also hold the four signing secrets described in [Release signing](#release-signing).
 

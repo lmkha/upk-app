@@ -3,14 +3,11 @@ name: Build APK
 # Builds the APK of one environment. Each GitHub Environment (develop, staging,
 # production) owns its own SECRETS_PROPERTIES and GOOGLE_SERVICES_JSON secrets.
 #
-#   push to main                  -> develop environment (debug APK artifact)
 #   push tag v*.*.*-* (e.g. -rc.1)-> staging environment (release APK + GitHub Pre-release)
 #   push tag v*.*.*               -> production environment (release APK + GitHub Release)
-#   manual run                    -> the environment picked in the dropdown
+#   manual run                    -> the environment picked in the dropdown (develop, staging, production)
 on:
   push:
-    branches:
-      - main
     tags:
       - "v*.*.*"
   workflow_dispatch:
@@ -30,12 +27,11 @@ on:
         default: true
         type: boolean
 
-# A newer push to main cancels the dev build that is still in progress, so only
-# the latest commit is built. Tag builds and manual runs are never cancelled: a
-# second run of the same tag, or of the same manual target, waits for the first.
+# Tag builds and manual runs are never cancelled: a second run of the same tag,
+# or of the same manual target, waits for the first.
 concurrency:
   group: build-apk-${{ github.ref }}-${{ inputs.environment || 'auto' }}
-  cancel-in-progress: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+  cancel-in-progress: false
 
 permissions:
   contents: write
