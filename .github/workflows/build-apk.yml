@@ -153,13 +153,15 @@ jobs:
           tasks+=("${ASSEMBLE_TASK}")
           ./gradlew "${tasks[@]}"
 
+      # Tag builds publish the APK directly to GitHub Releases, so only manual runs upload an artifact.
       - name: Upload APK Artifact
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@v7
         with:
           name: upk-${{ steps.variant.outputs.environment }}-${{ steps.variant.outputs.build_type }}-apk
           path: app/build/outputs/apk/${{ steps.variant.outputs.build_type }}/*.apk
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 3
 
       - name: Publish GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
