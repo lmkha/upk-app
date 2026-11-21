@@ -3,5 +3,5 @@ plugins {
 }
 
 android {
-    configureAndroidCommon(libs)
+    configureAndroidCommon()
 }
