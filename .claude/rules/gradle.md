@@ -24,10 +24,6 @@ paths:
 - `compileSdk`, `minSdk`, `targetSdk`, Java target and `testInstrumentationRunner` are shared through `build-logic` convention plugins (`upk.android.application`, `upk.android.library`) configured in `build-logic/src/main/kotlin/AndroidCommon.kt`; do not duplicate them in module `build.gradle.kts` files.
 - Cross-cutting build logic lives in `build-logic/src/main/kotlin/upk.<name>.gradle.kts` and is applied via version catalog aliases (e.g. `alias(libs.plugins.upk.android.library)`, `alias(libs.plugins.upkProtobuf)`). Do not copy plugin configuration between modules.
 - After any build-file change run `./gradlew :<module>:testDebugUnitTest` (or `:app:assembleDebug` when no tests exist) to prove it still configures.
-- A module that needs a per-environment value reads its own `BuildConfig`. That takes three things in its `build.gradle.kts`, all required:
-  - `alias(libs.plugins.secrets)` in `plugins`,
-  - `buildFeatures { buildConfig = true }` inside `android`,
-  - a top-level `secrets { propertiesFileName = "secrets.properties" }` block.
-- Never omit the `secrets { }` block. Without it the plugin silently reads `local.properties`, which holds no project keys, so the `BuildConfig` fields are not generated and the module fails with "Unresolved reference". `core/data/build.gradle.kts` is the reference.
+- A module that needs a per-environment value reads its own `BuildConfig` by applying `alias(libs.plugins.upk.secrets)` in its `plugins` block (`core/data/build.gradle.kts` is the reference). That convention plugin enables `buildFeatures.buildConfig` and sets `secrets { propertiesFileName = "secrets.properties" }`; do not apply `libs.plugins.secrets` or configure `secrets { }` directly in modules.
 - Never hand-write `buildConfigField` for per-environment values.
 - Never touch `local.properties`, `secrets.properties`, `secrets/` or `.idea/` in a change.

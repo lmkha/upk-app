@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.secrets)
+    alias(libs.plugins.upk.secrets)
     alias(libs.plugins.upkProtobuf)
 }
 
@@ -13,15 +13,6 @@ android {
     defaultConfig {
         consumerProguardFiles("consumer-rules.pro")
     }
-
-    // BuildConfig fields come from the secrets plugin: every key of secrets.properties.
-    buildFeatures {
-        buildConfig = true
-    }
-}
-
-secrets {
-    propertiesFileName = "secrets.properties"
 }
 
 dependencies {
