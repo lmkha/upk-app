@@ -9,6 +9,7 @@ repositories {
 }
 
 dependencies {
+    implementation(libs.android.gradle.plugin)
     implementation(libs.protobuf.gradle.plugin)
 }
 

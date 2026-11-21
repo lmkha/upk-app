@@ -1,27 +1,11 @@
 plugins {
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.upk.android.library)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
 }
 
 android {
     namespace = "com.example.upk.core.analytics"
-    compileSdk {
-        version = release(37) {
-            minorApiLevel = 2
-        }
-    }
-
-    defaultConfig {
-        minSdk = 29
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
 }
 
 dependencies {

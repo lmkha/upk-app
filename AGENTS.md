@@ -15,7 +15,7 @@ core/crashlytics/         CrashReporter contract, Firebase Crashlytics implement
 feature/<name>/domain/    models, repository interfaces, use cases. Pure Kotlin, no Android deps in logic
 feature/<name>/data/      repository impls, local data sources (DataStore), DI module binding impls
 feature/<name>/ui/        Compose screens + ViewModels
-build-logic/              convention plugins (upk.protobuf)
+build-logic/              convention plugins (upk.android.application, upk.android.library, upk.protobuf)
 gradle/libs.versions.toml version catalog; every dependency goes here, never a hardcoded version
 docs/                     the owner's testing study notes, written in Vietnamese on purpose; not a rule source
 scripts/                  environment setup (use-env.sh, use-env.bat), repo maintenance (sync-agent-rules.sh)

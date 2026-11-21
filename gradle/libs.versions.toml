@@ -1,4 +1,8 @@
 [versions]
+compileSdk = "37"
+compileSdkMinor = "2"
+minSdk = "29"
+targetSdk = "37"
 agp = "9.5.2"
 converterKotlinxSerialization = "3.0.0"
 coreSplashscreen = "1.2.0"
@@ -30,6 +34,7 @@ secrets = "2.0.1"
 googleServices = "4.6.0"
 
 [libraries]
+android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastorePreferences" }
@@ -79,6 +84,8 @@ hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndro
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+upk-android-application = { id = "upk.android.application" }
+upk-android-library = { id = "upk.android.library" }
 upkProtobuf = { id = "upk.protobuf" }
 secrets = { id = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", version.ref = "secrets" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
