@@ -1,27 +1,20 @@
 import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.JavaVersion
-import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalog
-import org.gradle.api.artifacts.VersionCatalogsExtension
 
-internal val Project.libs: VersionCatalog
-    get() = extensions.getByType(VersionCatalogsExtension::class.java).named("libs")
+private const val COMPILE_SDK = 37
+private const val COMPILE_SDK_MINOR = 2
+private const val MIN_SDK = 29
+internal const val TARGET_SDK = 37
 
-internal fun VersionCatalog.intVersion(alias: String): Int =
-    findVersion(alias).get().requiredVersion.toInt()
-
-internal fun CommonExtension.configureAndroidCommon(libs: VersionCatalog) {
-    val compileSdkMajor = libs.intVersion("compileSdk")
-    val compileSdkMinor = libs.intVersion("compileSdkMinor")
-
+internal fun CommonExtension.configureAndroidCommon() {
     compileSdk {
-        version = release(compileSdkMajor) {
-            minorApiLevel = compileSdkMinor
+        version = release(COMPILE_SDK) {
+            minorApiLevel = COMPILE_SDK_MINOR
         }
     }
 
     defaultConfig.apply {
-        minSdk = libs.intVersion("minSdk")
+        minSdk = MIN_SDK
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 

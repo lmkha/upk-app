@@ -3,9 +3,9 @@ plugins {
 }
 
 android {
-    configureAndroidCommon(libs)
+    configureAndroidCommon()
 
     defaultConfig {
-        targetSdk = libs.intVersion("targetSdk")
+        targetSdk = TARGET_SDK
     }
 }

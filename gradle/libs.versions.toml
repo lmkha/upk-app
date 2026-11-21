@@ -1,8 +1,4 @@
 [versions]
-compileSdk = "37"
-compileSdkMinor = "2"
-minSdk = "29"
-targetSdk = "37"
 agp = "9.5.2"
 converterKotlinxSerialization = "3.0.0"
 coreSplashscreen = "1.2.0"
